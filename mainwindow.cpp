@@ -5,159 +5,15 @@
 #include <QApplication>
 #include <QDebug>
 #include <QFileDialog>
-#include <QPushButton>
 #include <QEvent>
 #include <QFile>
-#include <QAudioDeviceInfo>
-#include <QAudioOutput>
 
 
 #include "mainwindow.h"
-#include "interface.h"
-#include "screen.h"
-
+#include "video.h"
 #include "input.h"
+#include "audio.h"
 
-
-#include <iostream>
-#include <queue>
-//#include "serializable.h"
-
-
-//class SubSerial : public Serializable
-//{
-//public:
-//    SubSerial()
-//    {
-//        AddField("sub1", &sub1);
-//        AddField("sub2", &sub2);
-//    }
-
-//    void reset()
-//    {
-//        sub1 = 0;
-//        sub2 = 0;
-//    }
-
-//private:
-//    byte sub1 = 13;
-//    word sub2 = 2354;
-//};
-
-//class SerialTest : public Serializable
-//{
-//    struct sreg : reg//read only
-//    {
-//        byte v = 0;     // vertical blank started
-//        byte s = 0;     // sprite 0 hit
-//        byte o = 0;     // sprite overflow
-//        void operator =(byte val) { v = (val >> 7) & 0x01; s = (val >> 6) & 0x01; o = (val >> 5) & 0x01; }
-//        operator byte() const { return (v << 7 | s << 6 | o << 5); }
-//    };
-
-//public:
-//    SerialTest()
-//    {
-//        AddField("reg", &mSreg);
-//        AddField("byte", &mByte);
-//        AddField("word", &mWord);
-//        AddField("bool", &mBool);
-//        AddField("array", (byte*)mBArr, 16);
-//        AddField("marray", (byte*)mBMAr, 16*32);
-//        AddField("serial", &mSub);
-
-//        mSreg.v = 1;
-//        mSreg.o = 1;
-//    }
-
-//    void reset()
-//    {
-//        mSreg = 0;
-//        mByte = 0;
-//        mWord = 0;
-//        mBool = false;
-//        for (int i = 0; i < 16; i++)
-//            mBArr[i] = 0;
-//        for (int i = 0; i < 16; i++)
-//            for (int j = 0; j < 32; j++)
-//                mBMAr[i][j] = 0;
-//        mSub.reset();
-//    }
-
-//private:
-//    sreg mSreg;
-//    byte mByte = 23;
-//    word mWord = 1034;
-//    bool mBool = true;
-//    byte mBArr[16] = { 0x50, 0x40, 0x56, 0x48, 0x64, 0x65, 0x43, 0x54, 0x87, 0x86, 0x47, 0x35, 0x43, 0x57, 0x86, 0x70 };
-//    byte mBMAr[16][32] = { };
-//    SubSerial mSub;
-//};
-
-
-
-
-class PulseBackend : public IAudio
-{
-    struct audiobuffer
-    {
-        float buffer[800] = {};
-        int length = 0;
-    };
-
-public:
-    PulseBackend()
-    {
-        QAudioFormat format;
-        format.setSampleRate(48000);
-        format.setChannelCount(1);
-        format.setSampleType(QAudioFormat::Float);
-        format.setSampleSize(sizeof(float) * 8);
-        format.setCodec("audio/pcm");
-        mOutput = new QAudioOutput(format);
-        mDevice = mOutput->start();
-        for (int i = 0; i < 20; i++)
-        {
-            mBuffers.push(audiobuffer());
-        }
-    }
-
-public:
-    void AudioUpdate(const AudioBuffer& buffer)
-    {
-        auto next = mBuffers.front();
-        mBuffers.pop();
-
-        for (auto sample : buffer)
-        {
-            mCount -= 1;
-            if (mCount <= 0)
-            {
-                mCount += 37.2869375;
-                next.buffer[next.length++] = sample;
-            }
-        }
-        mQueued.push(next);
-
-        while (mQueued.size() > 10)
-        {
-            auto abuf = mQueued.front();
-            mDevice->write((char*)abuf.buffer, abuf.length * sizeof(float));
-            mQueued.pop();
-            abuf.length = 0;
-            mBuffers.push(abuf);
-        }
-
-    }
-
-private:
-    QAudioOutput* mOutput;
-    QIODevice* mDevice;
-    double mCount = 0.0;
-    std::queue<audiobuffer> mBuffers;
-    std::queue<audiobuffer> mQueued;
-
-};
 
 
 
@@ -165,8 +21,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
     SetupUI();
 
-    auto video = new Screen(this);
-    auto audio = new PulseBackend;
+    auto video = new Video(this);
+    auto audio = new Audio;
     auto input = new Input(this);
 
     mNes = new NES(video, audio, input);
@@ -176,17 +32,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     setCentralWidget(video);
     resize(512, 480 + menuBar()->height());
-
-//    SerialTest st;
-//    auto s = st.serialize();
-//    auto a = s.dump(4);
-//    std::cout << a << std::endl;
-
-//    SerialTest st2;
-//    st2.reset();
-//    st2.deserialize(s);
-//    mAudio = audio;
-
 }
 
 MainWindow::~MainWindow()
@@ -207,7 +52,7 @@ void MainWindow::Play()
     {
         mPlaying = true;
         mLast = std::chrono::high_resolution_clock::now();
-        mTimer = startTimer(16, Qt::TimerType::PreciseTimer);
+        mTimer = startTimer(17, Qt::TimerType::PreciseTimer);
     }
 }
 

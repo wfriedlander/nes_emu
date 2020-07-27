@@ -1,5 +1,6 @@
-#include "screen.h"
+#include "video.h"
 
+#include <QImage>
 
 const GLchar* vertexSource = R"glsl(
     #version 330 core
@@ -26,19 +27,19 @@ const GLchar* fragmentSource = R"glsl(
     void main()
     {
         FragColor = texture(iTexture, TexCoord);
-        //FragColor = vec4(1.0, 0.0, 0.6, 1.0);
+        //FragColor = vec4(0.0, 0.0, 0.6, 1.0);
         //FragColor = vec4(TexCoord, 0.0, 1.0);
     }
 )glsl";
 
 
 
-Screen::Screen(QWidget *parent) : QOpenGLWidget(parent)
+Video::Video(QWidget *parent) : QOpenGLWidget(parent)
 {
 
 }
 
-Screen::~Screen()
+Video::~Video()
 {
     if (mInitialized)
     {
@@ -48,7 +49,7 @@ Screen::~Screen()
     }
 }
 
-void Screen::VideoUpdate(const ScreenBuffer &buffer)
+void Video::VideoUpdate(const ScreenBuffer &buffer)
 {
     for (int y = 0; y < 240; y++)
     {
@@ -58,22 +59,41 @@ void Screen::VideoUpdate(const ScreenBuffer &buffer)
         }
     }
 
+//    if (mCount % 30 == 0)
+//    {
+//        QImage im((uchar*)(&mFrame[0][0]), 256, 240, QImage::Format_RGB888);
+//        im.mirrored(false, true).save(QString("frame_" + QString::number(mCount) + QString(".bmp")));
+//    }
+//    mCount += 1;
+
+
+
     glBindTexture(GL_TEXTURE_2D, mTexture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 256, 240, 0, GL_RGB, GL_UNSIGNED_BYTE, &mFrame);
     update();
 }
 
-void Screen::initializeGL()
+void Video::initializeGL()
 {
     initializeOpenGLFunctions();
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(0.75f, 0.5f, 0.25f, 1.0f);
+
+//    float vertices[] = {
+//        // positions         // tex coords
+//        -1.0f, -1.0f, 0.0f,  0.0f, 0.0f,
+//         1.0f, -1.0f, 0.0f,  1.0f, 0.0f,
+//        -1.0f,  1.0f, 0.0f,  0.0f, 1.0f,
+//         1.0f,  1.0f, 0.0f,  1.0f, 1.0f
+//    };
 
     float vertices[] = {
         // positions         // tex coords
-        -1.0f, -1.0f, 0.0f,  0.0f, 0.0f,
+         1.0f,  1.0f, 0.0f,  1.0f, 1.0f,
          1.0f, -1.0f, 0.0f,  1.0f, 0.0f,
         -1.0f,  1.0f, 0.0f,  0.0f, 1.0f,
-         1.0f,  1.0f, 0.0f,  1.0f, 1.0f
+         1.0f, -1.0f, 0.0f,  1.0f, 0.0f,
+        -1.0f, -1.0f, 0.0f,  0.0f, 0.0f,
+        -1.0f,  1.0f, 0.0f,  0.0f, 1.0f
     };
 
     glGenVertexArrays(1, &mVAO);
@@ -125,17 +145,17 @@ void Screen::initializeGL()
     mInitialized = true;
 }
 
-void Screen::resizeGL(int w, int h)
+void Video::resizeGL(int w, int h)
 {
     glViewport(0, 0, w, h);
 }
 
-void Screen::paintGL()
+void Video::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, mTexture);
     glUseProgram(mShader);
     glBindVertexArray(mVAO);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 }

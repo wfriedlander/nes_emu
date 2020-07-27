@@ -17,6 +17,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     apu.cpp \
+    audio.cpp \
+    blipbuffer.cpp \
     bus.cpp \
     cartridge.cpp \
     controller.cpp \
@@ -29,11 +31,13 @@ SOURCES += \
     mappers.cpp \
     nes.cpp \
     ppu.cpp \
-    screen.cpp \
-    serializer.cpp
+    serializer.cpp \
+    video.cpp
 
 HEADERS += \
     apu.h \
+    audio.h \
+    blipbuffer.h \
     bus.h \
     cartridge.h \
     common.h \
@@ -48,8 +52,8 @@ HEADERS += \
     mappers.h \
     nes.h \
     ppu.h \
-    screen.h \
-    serializer.h
+    serializer.h \
+    video.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -58,3 +62,9 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 FORMS += \
     test.ui
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../PortAudio/Release/ -lportaudio_x86
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../PortAudio/Debug/ -lportaudio_x86
+
+INCLUDEPATH += $$PWD/../PortAudio/include
+DEPENDPATH += $$PWD/../PortAudio/include

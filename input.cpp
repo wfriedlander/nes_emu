@@ -2,6 +2,7 @@
 
 #include <QDebug>
 #include <QKeyEvent>
+#include <QFocusEvent>
 #include <QGamepad>
 #include <QGamepadManager>
 
@@ -9,9 +10,10 @@
 Input::Input(QWidget *parent) : QWidget(parent)
 {
     setVisible(false);
+    setFocusPolicy(Qt::FocusPolicy::StrongFocus);
     setFocus();
 
-
+    qDebug() << "focus set";
 
 //    qDebug() << "QGamePadManager Demo\n";
 
@@ -134,4 +136,14 @@ void Input::keyReleaseEvent(QKeyEvent *event)
         mState.right = false;
         break;
     }
+}
+
+void Input::focusInEvent(QFocusEvent *event)
+{
+    qDebug() << "focus in" << event;
+}
+
+void Input::focusOutEvent(QFocusEvent *event)
+{
+    qDebug() << "focus out" << event;
 }

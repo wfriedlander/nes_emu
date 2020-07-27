@@ -7,7 +7,7 @@
 #include "interface.h"
 
 
-class Screen : public QOpenGLWidget, protected QOpenGLExtraFunctions, public IVideo
+class Video : public QOpenGLWidget, protected QOpenGLExtraFunctions, public IVideo
 {
     Q_OBJECT
 
@@ -20,8 +20,8 @@ class Screen : public QOpenGLWidget, protected QOpenGLExtraFunctions, public IVi
     using FrameBuffer = std::array<std::array<Color, 256>, 240>;
 
 public:
-    explicit Screen(QWidget *parent = nullptr);
-    ~Screen();
+    explicit Video(QWidget *parent = nullptr);
+    ~Video();
 
 public:
     void VideoUpdate(const ScreenBuffer& buffer) override;
@@ -33,6 +33,8 @@ protected:
 
 private:
     bool mInitialized = false;
+
+    int mCount = 0;
 
     GLuint mVBO;
     GLuint mVAO;

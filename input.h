@@ -40,6 +40,10 @@ private:
 private:
     ButtonState mState = { };
 
+protected:
+    void focusInEvent(QFocusEvent *event) override;
+    void focusOutEvent(QFocusEvent *event) override;
+
 
 signals:
 

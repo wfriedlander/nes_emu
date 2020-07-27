@@ -14,13 +14,22 @@ public:
 
 
 using AudioBuffer = std::vector<float>;
+class Blip_Buffer;
 
 class IAudio
 {
 public:
-    virtual void AudioUpdate(const AudioBuffer& buffer) = 0;
+//    virtual void AudioUpdate(const AudioBuffer& buffer) = 0;
+    virtual void SetBuffer(Blip_Buffer* buffer) = 0;
 };
 
+class Blip_Buffer;
+
+class BAudio
+{
+public:
+    virtual void SetBuffer(Blip_Buffer* buffer) = 0;
+};
 
 struct ButtonState
 {

@@ -40,7 +40,7 @@ private:
 	std::unique_ptr<Bus> mBus;
 	std::unique_ptr<CPU> mCPU;
 	std::unique_ptr<PPU> mPPU;
-	std::unique_ptr<APU> mAPU;
+    std::unique_ptr<APU> mAPU;
 	std::unique_ptr<Cartridge> mCartridge;
 	std::unique_ptr<Controller> mController;
 
