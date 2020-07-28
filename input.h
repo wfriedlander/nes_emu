@@ -27,8 +27,8 @@ protected:
 
 private:
     ButtonMap mMapping = {
-        {Qt::Key_D, Button::A},
-        {Qt::Key_F, Button::B},
+        {Qt::Key_F, Button::A},
+        {Qt::Key_D, Button::B},
         {Qt::Key_Return, Button::Start},
         {Qt::Key_Shift, Button::Select},
         {Qt::Key_Up, Button::Up},
@@ -39,6 +39,10 @@ private:
 
 private:
     ButtonState mState = { };
+
+protected:
+    void focusInEvent(QFocusEvent *event) override;
+    void focusOutEvent(QFocusEvent *event) override;
 
 
 signals:

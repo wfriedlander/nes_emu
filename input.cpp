@@ -2,6 +2,7 @@
 
 #include <QDebug>
 #include <QKeyEvent>
+#include <QFocusEvent>
 #include <QGamepad>
 #include <QGamepadManager>
 
@@ -9,9 +10,10 @@
 Input::Input(QWidget *parent) : QWidget(parent)
 {
     setVisible(false);
+    setFocusPolicy(Qt::FocusPolicy::StrongFocus);
     setFocus();
 
-
+    qDebug() << "focus set";
 
 //    qDebug() << "QGamePadManager Demo\n";
 
@@ -57,29 +59,14 @@ const ButtonState &Input::InputUpdate()
 
 const Input::ButtonMap & Input::MapButton(int key, Input::Button button)
 {
-//    for (const auto& [k, v] : mMapping)
-//    {
-//        if (v == button)
-//        {
-//            qDebug() << k << " " << key;
-//            mMapping.erase(k);
-//        }
-//    }
-
-    for (auto it = mMapping.cbegin(); it != mMapping.cend();)
+    for (const auto& [k, v] : mMapping)
     {
-        if(it->second == button)
+        if (v == button)
         {
-            mMapping.erase(it++);
+            mMapping.erase(k);
         }
-        else
-        {
-            ++it;
-        }
-
     }
     mMapping[key] = button;
-
     return mMapping;
 }
 
@@ -149,4 +136,14 @@ void Input::keyReleaseEvent(QKeyEvent *event)
         mState.right = false;
         break;
     }
+}
+
+void Input::focusInEvent(QFocusEvent *event)
+{
+    qDebug() << "focus in" << event;
+}
+
+void Input::focusOutEvent(QFocusEvent *event)
+{
+    qDebug() << "focus out" << event;
 }

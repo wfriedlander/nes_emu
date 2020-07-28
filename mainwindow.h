@@ -5,7 +5,6 @@
 
 #include "nes.h"
 #include "gameloader.h"
-#include "input.h"
 
 class MainWindow : public QMainWindow
 {
@@ -44,7 +43,6 @@ private:
     NES* mNes = nullptr;
     bool mPlaying = false;
     int mTimer = -1;
-    Input *input = new Input(this);
 
 private:
     QMenu* mRecent;
