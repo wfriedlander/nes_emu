@@ -10,7 +10,7 @@ NES::NES(IVideo* video, IAudio* audio, IInput* input) : mVideo(video), mAudio(au
 	mBus = std::make_unique<Bus>();
 	mCPU = std::make_unique<CPU>(mBus.get());
 	mPPU = std::make_unique<PPU>(mBus.get());
-    mAPU = std::make_unique<APU>(mBus.get());
+	mAPU = std::make_unique<APU>(mBus.get());
 	mController = std::make_unique<Controller>();
 
 	mPPU->SetVideoBackend(mVideo);
@@ -58,7 +58,7 @@ bool NES::Step()
     mDone = false;
     byte cycles = mCPU->Step();
 	mPPU->Execute(cycles * 3);
-    mAPU->Execute(cycles);
+	mAPU->Execute(cycles);
     return mDone;
 }
 

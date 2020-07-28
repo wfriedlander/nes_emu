@@ -19,7 +19,7 @@ public:
 	Bus();
 
 public:
-    void Initialize(NES* nes, CPU* cpu, PPU* ppu, APU* apu, Controller* control);
+	void Initialize(NES* nes, CPU* cpu, PPU* ppu, APU* apu, Controller* control);
 	void LoadGame(Cartridge* cart);
 	void Reset();
 
@@ -38,7 +38,7 @@ private:
 	NES* mNES = nullptr;
 	CPU* mCPU = nullptr;
 	PPU* mPPU = nullptr;
-    APU* mAPU = nullptr;
+	APU* mAPU = nullptr;
 	Cartridge* mCartridge = nullptr;
 	Controller* mController = nullptr;
 
