@@ -108,6 +108,6 @@ void ControllerInput::keyPressEvent(QKeyEvent *event)
         break;
 
     }
-    //qDebug() << event->text();
-    //qDebug() << event->key();
+//    qDebug() << event->text();
+//    qDebug() << event->key();
 }

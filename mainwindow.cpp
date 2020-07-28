@@ -13,7 +13,7 @@
 #include "video.h"
 #include "input.h"
 #include "audio.h"
-
+#include "controllerinput.h"
 
 
 
@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     auto video = new Video(this);
     auto audio = new Audio;
-    //auto input = new Input(this);
+    mInput = new Input(this);
 
     mNes = new NES(video, audio, mInput);
     mLoader = new GameLoader(mNes);
