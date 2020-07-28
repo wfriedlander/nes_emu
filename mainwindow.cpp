@@ -23,9 +23,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     auto video = new Video(this);
     auto audio = new Audio;
-    auto input = new Input(this);
+    //auto input = new Input(this);
 
-    mNes = new NES(video, audio, input);
+    mNes = new NES(video, audio, mInput);
     mLoader = new GameLoader(mNes);
 
     UpdateRecents();
@@ -109,7 +109,10 @@ void MainWindow::VideoSettings()
 
 void MainWindow::ControllerSettings()
 {
-
+	ControllerInput* settings = new ControllerInput();
+	settings->getInput(mInput);
+	settings->setWindowTitle("Change Controller Settings");
+	settings->show();
 }
 
 void MainWindow::About()

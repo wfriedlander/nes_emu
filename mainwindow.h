@@ -43,7 +43,7 @@ private:
     NES* mNes = nullptr;
     bool mPlaying = false;
     int mTimer = -1;
-
+	Input* mInput = new Input(this);
 private:
     QMenu* mRecent;
     std::chrono::time_point<std::chrono::high_resolution_clock> mLast;

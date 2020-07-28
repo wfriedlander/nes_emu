@@ -59,6 +59,7 @@ const ButtonState &Input::InputUpdate()
 
 const Input::ButtonMap & Input::MapButton(int key, Input::Button button)
 {
+	/*
     for (const auto& [k, v] : mMapping)
     {
         if (v == button)
@@ -66,6 +67,19 @@ const Input::ButtonMap & Input::MapButton(int key, Input::Button button)
             mMapping.erase(k);
         }
     }
+	*/
+	for (auto it = mMapping.cbegin(); it != mMapping.cend();)
+	{
+		if (it->second == button)
+		{
+			mMapping.erase(it++);
+		}
+		else
+		{
+			++it;
+		}
+
+	}
     mMapping[key] = button;
     return mMapping;
 }
