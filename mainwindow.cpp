@@ -14,23 +14,23 @@
 #include "input.h"
 #include "audio.h"
 #include "controllerinput.h"
-
+#include "gameloader.h"
 
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
     SetupUI();
 
-    auto video = new Video(this);
-    auto audio = new Audio;
+    mVideo = new Video(this);
+    mAudio = new Audio;
     mInput = new Input(this);
 
-    mNes = new NES(video, audio, mInput);
+    mNes = new NES(mVideo, mAudio, mInput);
     mLoader = new GameLoader(mNes);
 
     UpdateRecents();
 
-    setCentralWidget(video);
+    setCentralWidget(mVideo);
     resize(512, 480 + menuBar()->height());
 }
 

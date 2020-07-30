@@ -4,8 +4,11 @@
 #include <QMainWindow>
 
 #include "nes.h"
-#include "gameloader.h"
-#include "input.h"
+
+class GameLoader;
+class Input;
+class Audio;
+class Video;
 
 
 class MainWindow : public QMainWindow
@@ -43,9 +46,12 @@ private:
 private:
     GameLoader* mLoader = nullptr;
     NES* mNes = nullptr;
+    Input* mInput = nullptr;
+    Audio* mAudio = nullptr;
+    Video* mVideo = nullptr;
     bool mPlaying = false;
     int mTimer = -1;
-    Input* mInput = nullptr;
+
 private:
     QMenu* mRecent;
     std::chrono::time_point<std::chrono::high_resolution_clock> mLast;
