@@ -34,10 +34,10 @@ private:
 
 private:
     void LoadGame(const QString& filename);
+    void RunFrame();
     void UpdateRecents();
 
 protected:
-    void timerEvent(QTimerEvent *event) override;
     bool eventFilter(QObject *obj, QEvent *event) override;;
 
 private:
@@ -45,17 +45,16 @@ private:
 
 private:
     GameLoader* mLoader = nullptr;
-    NES* mNes = nullptr;
     Input* mInput = nullptr;
     Audio* mAudio = nullptr;
     Video* mVideo = nullptr;
-    bool mPlaying = false;
-    int mTimer = -1;
+    NES* mNes = nullptr;
+    QMenu* mRecent;
 
 private:
-    QMenu* mRecent;
-    std::chrono::time_point<std::chrono::high_resolution_clock> mLast;
-    int mMicro = 16666;
+    bool mPlaying = false;
+    std::chrono::high_resolution_clock::time_point mLastFrameTime;
+    double mFrameTimeAverage = 16.0;
 
 };
 #endif // MAINWINDOW_H

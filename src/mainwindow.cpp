@@ -4,6 +4,7 @@
 #include <QStatusBar>
 #include <QApplication>
 #include <QDebug>
+#include <QTimer>
 #include <QFileDialog>
 #include <QEvent>
 #include <QFile>
@@ -51,8 +52,8 @@ void MainWindow::Play()
     if (!mPlaying)
     {
         mPlaying = true;
-        mLast = std::chrono::high_resolution_clock::now();
-        mTimer = startTimer(17, Qt::TimerType::PreciseTimer);
+        mLastFrameTime = std::chrono::high_resolution_clock::now();
+        QTimer::singleShot(16, Qt::TimerType::PreciseTimer, this, &MainWindow::RunFrame);
     }
 }
 
@@ -61,8 +62,6 @@ void MainWindow::Pause()
     if (mPlaying)
     {
         mPlaying = false;
-        killTimer(mTimer);
-        mTimer = -1;
     }
 }
 
@@ -144,18 +143,19 @@ void MainWindow::UpdateRecents()
     mRecent->setEnabled(!mRecent->isEmpty());
 }
 
-void MainWindow::timerEvent(QTimerEvent *)
+void MainWindow::RunFrame()
 {
-    while(!mNes->Step());
-
-//    auto elapsed = std::chrono::high_resolution_clock::now() - mLast;
-//    auto p = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
-//    qDebug() << mMicro << p;
-//    mMicro += (16666 - p);
-//    mLast = std::chrono::high_resolution_clock::now();
-//    killTimer(mTimer);
-//    mTimer = startTimer(mMicro / 1000, Qt::TimerType::PreciseTimer);
-
+    auto now = std::chrono::high_resolution_clock::now();
+    auto elapsed = now - mLastFrameTime;
+    auto p = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
+    mLastFrameTime = now;
+    mFrameTimeAverage = (mFrameTimeAverage * 0.8) + (p / 5000.0);
+    auto ms = mFrameTimeAverage > 16.66666 ? 16 : 17;
+    qDebug() << p << mFrameTimeAverage << ms;
+    if (mPlaying) {
+        QTimer::singleShot(ms, Qt::TimerType::PreciseTimer, this, &MainWindow::RunFrame);
+        while(!mNes->Step());
+    }
 }
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
