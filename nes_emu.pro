@@ -66,17 +66,11 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-#win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../PortAudio/Release/ -lportaudio_x86
-#else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../PortAudio/Debug/ -lportaudio_x86
+win32: LIBS += -luser32 -ladvapi32
 
-#INCLUDEPATH += $$PWD/../PortAudio/include
-#DEPENDPATH += $$PWD/../PortAudio/include
-
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/extlib/windows/x86/release/ -lportaudio_x86
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/extlib/windows/x86/debug/ -lportaudio_x86
-else:unix: LIBS += -L$$PWD/extlib/linux/x86/ -lportaudio_x86
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/extlib/windows/x86/release/ -lportaudio_static_x86
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/extlib/windows/x86/debug/ -lportaudio_static_x86
+else:unix: LIBS += -L$$PWD/extlib/linux/x86/ -lportaudio_static_x86
 
 INCLUDEPATH += $$PWD/extlib/include
 DEPENDPATH += $$PWD/extlib/include
-
-
