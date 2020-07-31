@@ -2,7 +2,7 @@
 #define AUDIO_H
 
 #include "interface.h"
-#include "portaudio.h"
+#include "portaudio/portaudio.h"
 #include "blipbuffer.h"
 
 #include <chrono>

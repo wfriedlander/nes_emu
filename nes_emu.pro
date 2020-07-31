@@ -16,58 +16,67 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    apu.cpp \
-    audio.cpp \
-    blipbuffer.cpp \
-    bus.cpp \
-    cartridge.cpp \
-    controller.cpp \
-    controllerinput.cpp \
-    cpu.cpp \
-    gameloader.cpp \
-    gamewindow.cpp \
-    input.cpp \
-    main.cpp \
-    mainwindow.cpp \
-    mappers.cpp \
-    nes.cpp \
-    ppu.cpp \
-    serializer.cpp \
-    video.cpp
+    src/apu.cpp \
+    src/audio.cpp \
+    src/blipbuffer.cpp \
+    src/bus.cpp \
+    src/cartridge.cpp \
+    src/controller.cpp \
+    src/controllerinput.cpp \
+    src/cpu.cpp \
+    src/gameloader.cpp \
+    src/gamewindow.cpp \
+    src/input.cpp \
+    src/main.cpp \
+    src/mainwindow.cpp \
+    src/mappers.cpp \
+    src/nes.cpp \
+    src/ppu.cpp \
+    src/serializer.cpp \
+    src/video.cpp
 
 HEADERS += \
-    apu.h \
-    audio.h \
-    blipbuffer.h \
-    bus.h \
-    cartridge.h \
-    common.h \
-    controller.h \
-    controllerinput.h \
-    cpu.h \
-    gameloader.h \
-    gamewindow.h \
-    input.h \
-    interface.h \
-    json.h \
-    mainwindow.h \
-    mappers.h \
-    nes.h \
-    ppu.h \
-    serializer.h \
-    video.h
+    src/apu.h \
+    src/audio.h \
+    src/blipbuffer.h \
+    src/bus.h \
+    src/cartridge.h \
+    src/common.h \
+    src/controller.h \
+    src/controllerinput.h \
+    src/cpu.h \
+    src/gameloader.h \
+    src/gamewindow.h \
+    src/input.h \
+    src/interface.h \
+    src/json.h \
+    src/mainwindow.h \
+    src/mappers.h \
+    src/nes.h \
+    src/ppu.h \
+    src/serializer.h \
+    src/video.h
 
 FORMS += \
-    controllerinput.ui \
-    test.ui
+    src/controllerinput.ui \
+    src/test.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../PortAudio/Release/ -lportaudio_x86
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../PortAudio/Debug/ -lportaudio_x86
+#win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../PortAudio/Release/ -lportaudio_x86
+#else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../PortAudio/Debug/ -lportaudio_x86
 
-INCLUDEPATH += $$PWD/../PortAudio/include
-DEPENDPATH += $$PWD/../PortAudio/include
+#INCLUDEPATH += $$PWD/../PortAudio/include
+#DEPENDPATH += $$PWD/../PortAudio/include
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/extlib/windows/x86/release/ -lportaudio_x86
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/extlib/windows/x86/debug/ -lportaudio_x86
+else:unix: LIBS += -L$$PWD/extlib/linux/x86/ -lportaudio_x86
+
+INCLUDEPATH += $$PWD/extlib/include
+DEPENDPATH += $$PWD/extlib/include
+
+
