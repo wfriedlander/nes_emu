@@ -52,7 +52,8 @@ void MainWindow::Play()
     {
         mPlaying = true;
         mLast = std::chrono::high_resolution_clock::now();
-        mTimer = startTimer(17, Qt::TimerType::PreciseTimer);
+        mTimer = startTimer(16, Qt::TimerType::PreciseTimer);
+        mAudio->Play();
     }
 }
 
@@ -63,6 +64,7 @@ void MainWindow::Pause()
         mPlaying = false;
         killTimer(mTimer);
         mTimer = -1;
+        mAudio->Pause();
     }
 }
 

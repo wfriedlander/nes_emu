@@ -15,19 +15,30 @@ public:
     ~Audio();
 
 public:
+    void SetSampleRate(long sample_rate);
+    void SetLatency(long milliseconds);
+    void Pause();
+    void Play();
+
+public:
     void SetBuffer(Blip_Buffer* b);
     void Process(int16_t* out, int samples);
 
+
 private:
-    PaStream* stream;
-    PaStreamParameters params;
-    long target = 2400;
-    Blip_Buffer* buffer = nullptr;
-    decltype(std::chrono::high_resolution_clock::now()) start;
-    double avail_rate = 0;
-    long clock_rate = 1789773;
-    double last_rate = 0;
-    double delta_rate = 0;
+    PaStream* mStream;
+    Blip_Buffer* mBuffer = nullptr;
+
+    long mSampleRate = 48000;
+    long mLatency = 60;
+
+    std::chrono::high_resolution_clock::time_point mStart;
+    long mClockRate = 1789773;
+    long mFillTarget = 2880;
+    double mFillLevel = 2880;
+    double mLastFill = 2880;
+    double mDeltaFill = 0;
+
 };
 
 
