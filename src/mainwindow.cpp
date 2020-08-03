@@ -32,7 +32,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     UpdateRecents();
 
     setCentralWidget(mVideo);
-    resize(512, 480 + menuBar()->height());
+    // THIS DOESN'T WORK MUST MOVE TO SHOW EVENT OR SOMETHING
+    resize(512, 473 + menuBar()->height());
 }
 
 MainWindow::~MainWindow()

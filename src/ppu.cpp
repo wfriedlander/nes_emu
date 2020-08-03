@@ -58,7 +58,7 @@ void PPU::Execute(word cycles)
 		mLineExecuted = true;
 		if (mLine < 240)
 		{
-			RenderLine(mLine);
+            RenderLine(mLine-1);
 		}
 		else if (mLine == 241)
 		{
