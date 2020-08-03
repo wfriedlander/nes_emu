@@ -164,7 +164,7 @@ void PPU::RegisterWrite(word address, byte value)
 		mRegW = mRegW ^ 1;
 		break;
 	case 6:
-		if (mRegW)
+        if (!mRegW)
 		{
 			mRegT &= 0xFF;
 			mRegT |= (value & 0x3F) << 8;
