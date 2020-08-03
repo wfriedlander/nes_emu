@@ -292,9 +292,11 @@ void PPU::RenderLine(word line)
 		byte oam_pos = 0;
 		bool zero = false;
 
+        byte y_size = mControlReg.h ? 16 : 8;
+
 		for (byte i = 0; i < 64; i++)
 		{
-			if (primary[i].y < line && primary[i].y + 8 >= line)
+            if (primary[i].y < line && primary[i].y + y_size >= line)
 			{
 				if (oam_pos < 8)
 				{
@@ -310,43 +312,64 @@ void PPU::RenderLine(word line)
 			}
 		}
 
-		for (byte i = 0; i < oam_pos; i++)
-		{
-			if (i > 0)
-				zero = false;
+        for (byte i = 0; i < oam_pos; i++)
+        {
+            if (i > 0)
+                zero = false;
 
-			auto& sprite = secondary[i];
-			int ypx = (line - sprite.y - 1) & 0x7;
-			if (sprite.a & 0x80)
-				ypx = 7 - ypx;
-			word p = PatternTable(mControlReg.s, sprite.t, ypx);
-			for (int px = 7; px >= 0; px--)
-			{
-				byte dx = sprite.a & 0x40 ? px : (7 - px);
-				if (sprite.x + dx < 256)
-				{
-					byte color_index = (p >> (px * 2)) & 0x3;
-					byte palette_index = (sprite.a & 0x3) << 2;
-					word color_addr = 0x3F10 | palette_index | color_index;
+            auto& sprite = secondary[i];
 
-					bool opaque = color_index > 0;
-					bool foreground = !(sprite.a & 0x20);
-					bool background = mDepth[line][sprite.x + dx] > 0;
+            byte ypx = 0;
+            word p = 0;
 
-					if ((foreground || !background) && opaque)
-					{
-						mScreen[line][sprite.x + dx] = Read(color_addr) & 0x3F;
-					}
+            if (mControlReg.h)
+            {
+                auto page = sprite.t & 1;
+                ypx = (line - sprite.y - 1) & 0xF;
+                auto tile = (ypx > 7) ? ((sprite.t & 0xFE) + 1) : (sprite.t & 0xFE);
+                ypx &= 0x07;
+                if (sprite.a & 0x80)
+                {
+                    tile ^= 0x01;
+                    ypx = 7 - ypx;
+                }
+                p = PatternTable(page, tile, ypx);
+            }
+            else
+            {
+                ypx = (line - sprite.y - 1) & 0x7;
+                if (sprite.a & 0x80)
+                    ypx = 7 - ypx;
+                p = PatternTable(mControlReg.s, sprite.t, ypx);
+            }
 
-					if (zero && opaque && background && !mStatusReg.s && mMaskReg.sb)
-					{
-						mZeroPixel = sprite.x + dx;
-						mZeroLine = line;
-						//mStatusReg.s = 1;
-					}
-				}
-			}
-		}
+            for (int px = 7; px >= 0; px--)
+            {
+                byte dx = sprite.a & 0x40 ? px : (7 - px);
+                if (sprite.x + dx < 256)
+                {
+                    byte color_index = (p >> (px * 2)) & 0x3;
+                    byte palette_index = (sprite.a & 0x3) << 2;
+                    word color_addr = 0x3F10 | palette_index | color_index;
+
+                    bool opaque = color_index > 0;
+                    bool foreground = !(sprite.a & 0x20);
+                    bool background = mDepth[line][sprite.x + dx] > 0;
+
+                    if ((foreground || !background) && opaque)
+                    {
+                        mScreen[line][sprite.x + dx] = Read(color_addr) & 0x3F;
+                    }
+
+                    if (zero && opaque && background && !mStatusReg.s && mMaskReg.sb)
+                    {
+                        mZeroPixel = sprite.x + dx;
+                        mZeroLine = line;
+                        //mStatusReg.s = 1;
+                    }
+                }
+            }
+        }
 	}
 }
 
