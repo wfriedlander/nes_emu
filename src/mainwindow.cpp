@@ -151,7 +151,7 @@ void MainWindow::RunFrame()
     mLastFrameTime = now;
     mFrameTimeAverage = (mFrameTimeAverage * 0.8) + (p / 5000.0);
     auto ms = mFrameTimeAverage > 16.66666 ? 16 : 17;
-    qDebug() << p << mFrameTimeAverage << ms;
+//    qDebug() << p << mFrameTimeAverage << ms;
     if (mPlaying) {
         QTimer::singleShot(ms, Qt::TimerType::PreciseTimer, this, &MainWindow::RunFrame);
         while(!mNes->Step());

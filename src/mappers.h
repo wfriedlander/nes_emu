@@ -58,3 +58,40 @@ protected:
 	byte NameRead(byte table, word address) override;
 	void NameWrite(byte table, word address, byte value) override;
 };
+
+
+class Mapper01 : public Mapper
+{
+public:
+    Mapper01(CartridgeConfig& config, std::ifstream& rom);
+
+public:
+    byte CpuRead(word address) override;
+    void CpuWrite(word address, byte value) override;
+
+protected:
+    byte PatternRead(word address) override;
+    void PatternWrite(word address, byte value) override;
+    byte NameRead(byte table, word address) override;
+    void NameWrite(byte table, word address, byte value) override;
+
+private:
+    void RegistersChanged();
+
+private:
+    CartSegment<8192> mPrgRam;
+    byte mPrgBankMode = 0;
+    byte mPrgControl = 0;
+    byte mChrBankMode = 0;
+    byte mChrControl0 = 0;
+    byte mChrControl1 = 0;
+    bool mPrgRamEnabled = true;
+
+    byte mPrgBank0 = 0;
+    byte mPrgBank1 = 0;
+    byte* mChrBank0 = nullptr;
+    byte* mChrBank1 = nullptr;
+
+    byte mShiftReg = 0;
+    byte mShiftCount = 0;
+};
