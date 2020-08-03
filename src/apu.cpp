@@ -137,7 +137,7 @@ void Pulse::HalfFrame()
 
 void Pulse::Process(word cycles)
 {
-    if (mSweepMuted || Silenced())
+    if (mSweepMuted || mTimerMuted || Silenced())
     {
         mSynth.update(0, 0);
         return;
@@ -180,11 +180,13 @@ void Pulse::SetTimerHigh(byte period)
 {
     mTimerReg = Word(period, mTimerReg & 0xFF);
     mSequencePos = 0;
+    mTimerMuted = (mTimerReg < 8);
 }
 
 void Pulse::SetTimerLow(byte period)
 {
     mTimerReg = Word(mTimerReg >> 8, period);
+    mTimerMuted = (mTimerReg < 8);
 }
 
 
@@ -355,8 +357,8 @@ void Noise::SetPeriod(byte period)
 
 APU::APU(Bus* bus) : mBus(bus), mPulse0(&mBuffer, 0), mPulse1(&mBuffer, 1), mTriangle(&mBuffer), mNoise(&mBuffer)
 {
-    mBuffer.clock_rate(1789773);
-    mBuffer.set_sample_rate(48000);
+//    mBuffer.clock_rate(1789773);
+//    mBuffer.set_sample_rate(48000);
 }
 
 void APU::SetAudioBackend(IAudio* audio)
