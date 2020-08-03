@@ -156,6 +156,7 @@ void Bus::CpuWrite(word address, byte value)
 		case 0x1E:
 		case 0x1F: break;
 		}
+        break;
 
 	default:
 		mCartridge->CpuWrite(address, value);

@@ -3,7 +3,7 @@
 
 #include <filesystem>
 
-
+#include <QDebug>
 
 std::unique_ptr<Cartridge> Cartridge::Load(std::string filename)
 {
@@ -33,9 +33,20 @@ std::unique_ptr<Cartridge> Cartridge::Load(std::string filename)
 	word mapper_id = (header[7] & 0xF0) | ((header[6] & 0xF0) >> 4);
 
 
+    qDebug() << "prg" << (int)config.prg_size;
+    qDebug() << "chr" << (int)config.chr_size;
+    qDebug() << "mirror" << (int)config.mirroring;
+    qDebug() << "persist" << (int)config.persistent;
+    qDebug() << "trainer" << (int)config.trainer;
+    qDebug() << "four" << (int)config.four_screen;
+    qDebug() << "ines2" << (int)ines2;
+    qDebug() << "mapper" << (int)mapper_id;
+
+
 	switch (mapper_id)
 	{
 	case 0:  return std::make_unique<Mapper00>(config, st);
+    case 1:  return std::make_unique<Mapper01>(config, st);
 	default: return nullptr;
 	}
 }

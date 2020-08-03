@@ -137,7 +137,7 @@ void Pulse::HalfFrame()
 
 void Pulse::Process(word cycles)
 {
-    if (mSweepMuted || Silenced())
+    if (mSweepMuted || mTimerMuted || Silenced())
     {
         mSynth.update(0, 0);
         return;
@@ -180,11 +180,13 @@ void Pulse::SetTimerHigh(byte period)
 {
     mTimerReg = Word(period, mTimerReg & 0xFF);
     mSequencePos = 0;
+    mTimerMuted = (mTimerReg < 8);
 }
 
 void Pulse::SetTimerLow(byte period)
 {
     mTimerReg = Word(mTimerReg >> 8, period);
+    mTimerMuted = (mTimerReg < 8);
 }
 
 
