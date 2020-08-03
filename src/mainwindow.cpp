@@ -32,7 +32,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     UpdateRecents();
 
     setCentralWidget(mVideo);
-    resize(512, 480 + menuBar()->height());
+    // THIS DOESN'T WORK MUST MOVE TO SHOW EVENT OR SOMETHING
+    resize(512, 473 + menuBar()->height());
 }
 
 MainWindow::~MainWindow()
@@ -151,7 +152,7 @@ void MainWindow::RunFrame()
     mLastFrameTime = now;
     mFrameTimeAverage = (mFrameTimeAverage * 0.8) + (p / 5000.0);
     auto ms = mFrameTimeAverage > 16.66666 ? 16 : 17;
-    qDebug() << p << mFrameTimeAverage << ms;
+//    qDebug() << p << mFrameTimeAverage << ms;
     if (mPlaying) {
         QTimer::singleShot(ms, Qt::TimerType::PreciseTimer, this, &MainWindow::RunFrame);
         while(!mNes->Step());

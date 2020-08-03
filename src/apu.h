@@ -82,6 +82,7 @@ private:
     // TIMER
     word mTimer = 0;
     word mTimerReg = 0;
+    bool mTimerMuted = true;
 
     // SWEEP
     bool mSweepReload = false;
