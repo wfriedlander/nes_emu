@@ -53,6 +53,7 @@ void MainWindow::Play()
     if (!mPlaying)
     {
         mPlaying = true;
+        mAudio->Play();
         mLastFrameTime = std::chrono::high_resolution_clock::now();
         QTimer::singleShot(16, Qt::TimerType::PreciseTimer, this, &MainWindow::RunFrame);
     }
@@ -63,6 +64,7 @@ void MainWindow::Pause()
     if (mPlaying)
     {
         mPlaying = false;
+        mAudio->Pause();
     }
 }
 

@@ -357,8 +357,8 @@ void Noise::SetPeriod(byte period)
 
 APU::APU(Bus* bus) : mBus(bus), mPulse0(&mBuffer, 0), mPulse1(&mBuffer, 1), mTriangle(&mBuffer), mNoise(&mBuffer)
 {
-    mBuffer.clock_rate(1789773);
-    mBuffer.set_sample_rate(48000);
+//    mBuffer.clock_rate(1789773);
+//    mBuffer.set_sample_rate(48000);
 }
 
 void APU::SetAudioBackend(IAudio* audio)
