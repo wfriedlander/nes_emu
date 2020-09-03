@@ -52,7 +52,7 @@ byte Bus::CpuRead(word address)
 	case 1: return mCpuRam[address & 0x07FF];
 
 	case 2:
-	case 3: return mPPU->RegisterRead(address & 0x7);
+    case 3: return mPPU->RegisterRead(mCPU->CurrentCycle(), address & 0x7);
 
 	case 4:
 		switch (address & 0x3FFF)
@@ -109,7 +109,7 @@ void Bus::CpuWrite(word address, byte value)
 
 	case 2:
 	case 3: 
-		mPPU->RegisterWrite(address & 0x7, value);
+        mPPU->RegisterWrite(mCPU->CurrentCycle(), address & 0x7, value);
 		break;
 
 	case 4:
@@ -145,6 +145,7 @@ void Bus::CpuWrite(word address, byte value)
 			break;
 
 		case 0x14:
+            mPPU->RunUntil(mCPU->CurrentCycle());
 			mPPU->ActivateDMA(value);
 			break;
 		case 0x18:

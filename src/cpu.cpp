@@ -1,732 +1,645 @@
 #include "cpu.h"
 
-#include <iostream>
-#include <fstream>
-#include <cstdio>
-#include <functional>
-
-
-CPU::CPU(Bus* bus) : bus(bus)
-{
-    fopen_s(&pFile, "log.txt", "w");
-    reg.pc = 0x400;
-
-    mSerializer.RegisterField("NMI", &mNMI);
-    mSerializer.RegisterField("IRQ", &mIRQ);
-    mSerializer.RegisterField("a", &reg.a);
-    mSerializer.RegisterField("x", &reg.x);
-    mSerializer.RegisterField("y", &reg.y);
-    mSerializer.RegisterField("sp", &reg.sp);
-    mSerializer.RegisterField("pc", &reg.pc);
-    mSerializer.RegisterField("sr", &reg.sr);
-}
-
-CPU::~CPU()
-{
-    fclose(pFile);
-}
+#include <QDebug>
 
 void CPU::Reset()
 {
-	reg.sr.b = 0;
-//	auto [h, l] = Bytes(reg.pc);
-	reg.sp--;
-	reg.sp--;
-	reg.sp--;
-	reg.pc = Word(Read(0xFFFD), Read(0xFFFC));
-	reg.sr.i = 1;
-}
-
-void CPU::SetNMI()
-{
-	mNMI = true;
-}
-
-void CPU::SetIRQ()
-{
-	mIRQ = true;
-}
-
-void CPU::DMA(byte address)
-{
-	for (word i = 0; i < 256; i++)
-	{
-		Write(0x2003, i & 0xFF);
-		Write(0x2004, Read(Word(address, i & 0xFF)));
-	}
+    sr.b = 0;
+    sp--;
+    sp--;
+    sp--;
+    pc = Word(Read(0xFFFD), Read(0xFFFC));
+    sr.i = 1;
+    mCycle = 0;
 }
 
 void CPU::NMI()
 {
-	reg.sr.b = 0;
-	auto [h, l] = Bytes(reg.pc);
-	Write(Word(0x01, reg.sp--), h);
-	Write(Word(0x01, reg.sp--), l);
-	Write(Word(0x01, reg.sp--), reg.sr);
-	reg.pc = Word(Read(0xFFFB), Read(0xFFFA));
-	reg.sr.i = 1;
-
-    if (mLog)
-        fprintf(pFile, "######################################################################################################\n\n");
+    sr.b = 0;
+    auto [h, l] = Bytes(pc);
+    Write(Word(0x01, sp--), h);
+    Write(Word(0x01, sp--), l);
+    Write(Word(0x01, sp--), sr);
+    pc = Word(Read(0xFFFB), Read(0xFFFA));
+    sr.i = 1;
 }
 
 void CPU::IRQ()
 {
-	reg.sr.b = 0;
-	auto [h, l] = Bytes(reg.pc);
-	Write(Word(0x01, reg.sp--), h);
-	Write(Word(0x01, reg.sp--), l);
-	Write(Word(0x01, reg.sp--), reg.sr);
-	reg.pc = Word(Read(0xFFFF), Read(0xFFFE));
-	reg.sr.i = 1;
+    sr.b = 0;
+    auto [h, l] = Bytes(pc);
+    Write(Word(0x01, sp--), h);
+    Write(Word(0x01, sp--), l);
+    Write(Word(0x01, sp--), sr);
+    pc = Word(Read(0xFFFF), Read(0xFFFE));
+    sr.i = 1;
 }
-
-void CPU::Log(Instruction& ins)
-{
-    byte status = reg.sr;
-
-    if (reg.pc == 0x8057)
-        return;
-	
-    fprintf(pFile, "%d %s %s ", total_cycles, ins.op_name.c_str(), ins.addr_name.c_str());
-    for (int i = 1; i < ins.bytes; i++)
-    {
-        fprintf(pFile, "%02X ", Read(reg.pc + i));
-    }
-	
-    fprintf(pFile, "\n\n PC  AC XR YR SR SP  N V - B D I Z C\n");
-    fprintf(pFile, "%04X %02X %02X %02X %02X %02X  %d %d %d %d %d %d %d %d\n\n",
-        reg.pc, reg.a, reg.x, reg.y, status, reg.sp,
-        reg.sr.n, reg.sr.v, 1, reg.sr.b, reg.sr.d, reg.sr.i, reg.sr.z, reg.sr.c);
-
-    //fprintf(pFile, "\n\n");
-}
-
-byte CPU::Step()
-{
-	//if (mNMI)
-	//{
-	//	mNMI = false;
-	//	NMI();
-	//	return 7;
-	//}
-
-	//if (mIRQ)
-	//{
-	//	mIRQ = false;
-	//	IRQ();
-	//	return 7;
-	//}
-
-	auto& instruction = opcode[Read(reg.pc)];
-	//if (mLog)
-	//	Log(instruction);
-	reg.pc += 1;
-	byte cycles = instruction.cycles + ((this)->*(instruction.addr))(instruction.op);
-	total_cycles += cycles;
-	return cycles;
-}
-
-void CPU::EnableLogging(bool enabled)
-{
-	mLog = enabled;
-}
-
-///////////////////////////////////////////////////////////////////
-// READ/WRITE
-///////////////////////////////////////////////////////////////////
 
 void CPU::Write(word address, byte value)
 {
-	bus->CpuWrite(address, value);
+    mCycle++;
+    mBus->CpuWrite(address, value);
 }
 
 byte CPU::Read(word address)
 {
-	return bus->CpuRead(address);
+    mCycle++;
+    return mBus->CpuRead(address);
+}
+
+void CPU::RunUntil(nes_time time)
+{
+    if (mNMI) {
+        NMI();
+        mNMI = false;
+    }
+
+    if (mIRQ && !sr.i) {
+        IRQ();
+    }
+
+    while (mCycle < time)
+    {
+        byte opcode = Read(pc);
+//        byte status = sr;
+//        fprintf(log, " PC  OP AC XR YR SR SP  N V - B D I Z C\n");
+//        fprintf(log, "%04X %02X %02X %02X %02X %02X %02X  %d %d %d %d %d %d %d %d\n\n",
+//            pc, opcode, a, x, y, status, sp, sr.n, sr.v, 1, sr.b, sr.d, sr.i, sr.z, sr.c);
+        pc++;
+
+        switch (opcode)
+        {
+        case 0x00: BRK(Immediate()); break;
+        case 0x01: ORA(Indirect_X()); break;
+        case 0x05: ORA(Zeropage()); break;
+        case 0x06: ASL(Zeropage()); break;
+        case 0x08: PHP(); break;
+        case 0x09: ORA(Immediate()); break;
+        case 0x0A: ASL_A(); break;
+        case 0x0D: ORA(Absolute()); break;
+        case 0x0E: ASL(Absolute()); break;
+        case 0x10: BRANCH(Relative(), !sr.n); break;
+        case 0x11: ORA(Indirect_Y()); break;
+        case 0x15: ORA(Zeropage_Indexed(x)); break;
+        case 0x16: ASL(Zeropage_Indexed(x)); break;
+        case 0x18: CLEAR(sr.c); break;
+        case 0x19: ORA(Absolute_Indexed(y)); break;
+        case 0x1D: ORA(Absolute_Indexed(x)); break;
+        case 0x1E: ASL(Absolute_Indexed_W(x)); break;
+        case 0x20: JSR(); break;
+        case 0x21: AND(Indirect_X()); break;
+        case 0x24: BIT(Zeropage()); break;
+        case 0x25: AND(Zeropage()); break;
+        case 0x26: ROL(Zeropage()); break;
+        case 0x28: PLP(); break;
+        case 0x29: AND(Immediate()); break;
+        case 0x2A: ROL_A(); break;
+        case 0x2C: BIT(Absolute()); break;
+        case 0x2D: AND(Absolute()); break;
+        case 0x2E: ROL(Absolute()); break;
+        case 0x30: BRANCH(Relative(), sr.n); break;
+        case 0x31: AND(Indirect_Y()); break;
+        case 0x35: AND(Zeropage_Indexed(x)); break;
+        case 0x36: ROL(Zeropage_Indexed(x)); break;
+        case 0x38: SET(sr.c); break;
+        case 0x39: AND(Absolute_Indexed(y)); break;
+        case 0x3D: AND(Absolute_Indexed(x)); break;
+        case 0x3E: ROL(Absolute_Indexed_W(x)); break;
+        case 0x40: RTI(); break;
+        case 0x41: EOR(Indirect_X()); break;
+        case 0x45: EOR(Zeropage()); break;
+        case 0x46: LSR(Zeropage()); break;
+        case 0x48: PHA(); break;
+        case 0x49: EOR(Immediate()); break;
+        case 0x4A: LSR_A(); break;
+        case 0x4C: JMP(Absolute()); break;
+        case 0x4D: EOR(Absolute()); break;
+        case 0x4E: LSR(Absolute()); break;
+        case 0x50: BRANCH(Relative(), !sr.v); break;
+        case 0x51: EOR(Indirect_Y()); break;
+        case 0x55: EOR(Zeropage_Indexed(x)); break;
+        case 0x56: LSR(Zeropage_Indexed(x)); break;
+        case 0x58: CLEAR(sr.i); break;
+        case 0x59: EOR(Absolute_Indexed(y)); break;
+        case 0x5D: EOR(Absolute_Indexed(x)); break;
+        case 0x5E: LSR(Absolute_Indexed_W(x)); break;
+        case 0x60: RTS(); break;
+        case 0x61: ADC(Indirect_X()); break;
+        case 0x65: ADC(Zeropage()); break;
+        case 0x66: ROR(Zeropage()); break;
+        case 0x68: PLA(); break;
+        case 0x69: ADC(Immediate()); break;
+        case 0x6A: ROR_A(); break;
+        case 0x6C: JMP(Indirect()); break;
+        case 0x6D: ADC(Absolute()); break;
+        case 0x6E: ROR(Absolute()); break;
+        case 0x70: BRANCH(Relative(), sr.v); break;
+        case 0x71: ADC(Indirect_Y()); break;
+        case 0x75: ADC(Zeropage_Indexed(x)); break;
+        case 0x76: ROR(Zeropage_Indexed(x)); break;
+        case 0x78: SET(sr.i); break;
+        case 0x79: ADC(Absolute_Indexed(y)); break;
+        case 0x7D: ADC(Absolute_Indexed(x)); break;
+        case 0x7E: ROR(Absolute_Indexed_W(x)); break;
+        case 0x81: STORE(Indirect_X(), a); break;
+        case 0x84: STORE(Zeropage(), y); break;
+        case 0x85: STORE(Zeropage(), a); break;
+        case 0x86: STORE(Zeropage(), x); break;
+        case 0x88: DECREMENT(y); break;
+        case 0x8A: TRANSFER(x, a); break;
+        case 0x8C: STORE(Absolute(), y); break;
+        case 0x8D: STORE(Absolute(), a); break;
+        case 0x8E: STORE(Absolute(), x); break;
+        case 0x90: BRANCH(Relative(), !sr.c); break;
+        case 0x91: STORE(Indirect_Y_W(), a); break;
+        case 0x94: STORE(Zeropage_Indexed(x), y); break;
+        case 0x95: STORE(Zeropage_Indexed(x), a); break;
+        case 0x96: STORE(Zeropage_Indexed(y), x); break;
+        case 0x98: TRANSFER(y, a); break;
+        case 0x99: STORE(Absolute_Indexed_W(y), a); break;
+        case 0x9A: TXS(); break;
+        case 0x9D: STORE(Absolute_Indexed_W(x), a); break;
+        case 0xA0: LOAD(Immediate(), y); break;
+        case 0xA1: LOAD(Indirect_X(), a); break;
+        case 0xA2: LOAD(Immediate(), x); break;
+        case 0xA4: LOAD(Zeropage(), y); break;
+        case 0xA5: LOAD(Zeropage(), a); break;
+        case 0xA6: LOAD(Zeropage(), x); break;
+        case 0xA8: TRANSFER(a, y); break;
+        case 0xA9: LOAD(Immediate(), a); break;
+        case 0xAA: TRANSFER(a, x); break;
+        case 0xAC: LOAD(Absolute(), y); break;
+        case 0xAD: LOAD(Absolute(), a); break;
+        case 0xAE: LOAD(Absolute(), x); break;
+        case 0xB0: BRANCH(Relative(), sr.c); break;
+        case 0xB1: LOAD(Indirect_Y(), a); break;
+        case 0xB4: LOAD(Zeropage_Indexed(x), y); break;
+        case 0xB5: LOAD(Zeropage_Indexed(x), a); break;
+        case 0xB6: LOAD(Zeropage_Indexed(y), x); break;
+        case 0xB8: CLEAR(sr.v); break;
+        case 0xB9: LOAD(Absolute_Indexed(y), a); break;
+        case 0xBA: TRANSFER(sp, x); break;
+        case 0xBC: LOAD(Absolute_Indexed(x), y); break;
+        case 0xBD: LOAD(Absolute_Indexed(x), a); break;
+        case 0xBE: LOAD(Absolute_Indexed(y), x); break;
+        case 0xC0: COMPARE(Immediate(), y); break;
+        case 0xC1: COMPARE(Indirect_X(), a); break;
+        case 0xC4: COMPARE(Zeropage(), y); break;
+        case 0xC5: COMPARE(Zeropage(), a); break;
+        case 0xC6: DEC(Zeropage()); break;
+        case 0xC8: INCREMENT(y); break;
+        case 0xC9: COMPARE(Immediate(), a); break;
+        case 0xCA: DECREMENT(x); break;
+        case 0xCC: COMPARE(Absolute(), y); break;
+        case 0xCD: COMPARE(Absolute(), a); break;
+        case 0xCE: DEC(Absolute()); break;
+        case 0xD0: BRANCH(Relative(), !sr.z); break;
+        case 0xD1: COMPARE(Indirect_Y(), a); break;
+        case 0xD5: COMPARE(Zeropage_Indexed(x), a); break;
+        case 0xD6: DEC(Zeropage_Indexed(x)); break;
+        case 0xD8: CLEAR(sr.d); break;
+        case 0xD9: COMPARE(Absolute_Indexed(y), a); break;
+        case 0xDD: COMPARE(Absolute_Indexed(x), a); break;
+        case 0xDE: DEC(Absolute_Indexed_W(x)); break;
+        case 0xE0: COMPARE(Immediate(), x); break;
+        case 0xE1: SBC(Indirect_X()); break;
+        case 0xE4: COMPARE(Zeropage(), x); break;
+        case 0xE5: SBC(Zeropage()); break;
+        case 0xE6: INC(Zeropage()); break;
+        case 0xE8: INCREMENT(x); break;
+        case 0xE9: SBC(Immediate()); break;
+        case 0xEC: COMPARE(Absolute(), x); break;
+        case 0xED: SBC(Absolute()); break;
+        case 0xEE: INC(Absolute()); break;
+        case 0xF0: BRANCH(Relative(), sr.z); break;
+        case 0xF1: SBC(Indirect_Y()); break;
+        case 0xF5: SBC(Zeropage_Indexed(x)); break;
+        case 0xF6: INC(Zeropage_Indexed(x)); break;
+        case 0xF8: SET(sr.d); break;
+        case 0xF9: SBC(Absolute_Indexed(y)); break;
+        case 0xFD: SBC(Absolute_Indexed(x)); break;
+        case 0xFE: INC(Absolute_Indexed_W(x)); break;
+        default:   NOP(); break;
+        }
+    }
 }
 
 
+///////////////////////////////////////////////////////////////////////////////////////
+// ADDRESSING MODES
 ///////////////////////////////////////////////////////////////////
-// ADDRESSING
-///////////////////////////////////////////////////////////////////
-byte CPU::Implied(const op_func& op)
+
+word CPU::Implied()
 {
-	std::invoke(op, this, 0);
-	return 0;
+    return 0;
 }
 
-byte CPU::Immediate(const op_func& op)
+word CPU::Immediate()
 {
-	word address = reg.pc;
-	reg.pc += 1;
-	std::invoke(op, this, address);
-	return 0;
+    return pc++;
 }
 
-byte CPU::Zeropage(const op_func& op)
+word CPU::Zeropage()
 {
-	word address = Read(reg.pc);
-	reg.pc += 1;
-	std::invoke(op, this, address);
-	return 0;
+    return Read(pc++);
 }
 
-byte CPU::Zeropage_X(const op_func& op)
+word CPU::Zeropage_Indexed(byte& reg)
 {
-	word address = Byte(Read(reg.pc) + reg.x);
-	reg.pc += 1;
-	std::invoke(op, this, address);
-	return 0;
+    word address = Read(pc++);
+    Read(address);
+    return ByteLow(address + reg);
 }
 
-byte CPU::Zeropage_Y(const op_func& op)
+word CPU::Absolute()
 {
-	word address = Byte(Read(reg.pc) + reg.y);
-	reg.pc += 1;
-	std::invoke(op, this, address);
-	return 0;
+    byte low = Read(pc++);
+    byte high = Read(pc++);
+    return Word(high, low);
 }
 
-byte CPU::Absolute(const op_func& op)
+word CPU::Absolute_Indexed(byte& reg)
 {
-	word address = Word(Read(reg.pc + 1), Read(reg.pc));
-	reg.pc += 2;
-	std::invoke(op, this, address);
-	return 0;
+    word address = Absolute() + reg;
+    if (reg > ByteLow(address)) {
+        Read(address);
+    }
+    return address;
 }
 
-byte CPU::Absolute_X(const op_func& op)
+word CPU::Absolute_Indexed_W(byte& reg)
 {
-	word address = Word(Read(reg.pc + 1), Read(reg.pc)) + reg.x;
-	reg.pc += 2;
-	std::invoke(op, this, address);
-	// add cycle if address & 0x00FF < cpu.x
-	return (reg.x < (address & 0x00FF)) ? 1 : 0;
+    word address = Absolute() + reg;
+    Read(address);
+    return address;
 }
 
-byte CPU::Absolute_Y(const op_func& op)
+word CPU::Relative()
 {
-	word address = Word(Read(reg.pc + 1), Read(reg.pc)) + reg.y;
-	reg.pc += 2;
-	std::invoke(op, this, address);
-	// add cycle if address & 0x00FF < cpu.y
-	return (reg.y < (address & 0x00FF)) ? 1 : 0;
+    return pc++;
 }
 
-byte CPU::Relative(const op_func& op)
+word CPU::Indirect()
 {
-	word address = reg.pc;
-	reg.pc += 1;
-	word t = reg.pc;
-	std::invoke(op, this, address);
-	// add cycle if reg.pc != cpu.alu;
-	// add cycle if (reg.pc & 0xFF00) != (cpu.alu & 0xFF00);
-	byte extra_cycle = ((reg.pc & 0x00FF) != (t & 0x00FF)) ? 1 : 0;
-    return extra_cycle + (((reg.pc & 0xFF00) != (t & 0xFF00)) ? 1 : 0);
+    byte l0 = Read(pc++);
+    byte h0 = Read(pc++);
+    byte l1 = Read(Word(h0, l0));
+    byte h1 = Read(Word(h0, Byte(l0 + 1)));
+    return Word(h1, l1);
 }
 
-byte CPU::Indirect(const op_func& op)
+word CPU::Indirect_X()
 {
-	byte l = Read(reg.pc);
-	byte h = Read(reg.pc + 1);
-	word address = Word(Read(Word(h, Byte(l + 1))), Read(Word(h, l)));
-	reg.pc += 2;
-	std::invoke(op, this, address);
-	return 0;
+    byte ptr = Read(pc++);
+    Read(ptr);
+    byte l0 = ptr + x;
+    byte h0 = l0 + 1;
+    byte l1 = Read(l0);
+    byte h1 = Read(h0);
+    return Word(h1, l1);
 }
 
-byte CPU::Indirect_X(const op_func& op)
+word CPU::Indirect_Y()
 {
-	byte l = (Read(reg.pc) + reg.x);
-	byte h = l + 1;
-	word address = Word(Read(h), Read(l));
-	reg.pc += 1;
-	std::invoke(op, this, address);
-	return 0;
+    byte l0 = Read(pc++);
+    byte h0 = l0 + 1;
+    byte l1 = Read(l0);
+    byte h1 = Read(h0);
+    word address = Word(h1, l1) + y;
+    if (y > ByteLow(address)) {
+        Read(address);
+    }
+    return address;
 }
 
-byte CPU::Indirect_Y(const op_func& op)
+word CPU::Indirect_Y_W()
 {
-	byte l = Read(reg.pc);
-	byte h = l + 1;
-	word address = Word(Read(h), Read(l)) + reg.y;
-	reg.pc += 1;
-	std::invoke(op, this, address);
-	// add cycle if address & 0x00FF < cpu.y
-	return (reg.y < (address & 0x00FF)) ? 1 : 0;
+    byte l0 = Read(pc++);
+    byte h0 = l0 + 1;
+    byte l1 = Read(l0);
+    byte h1 = Read(h0);
+    word address = Word(h1, l1) + y;
+    Read(address);
+    return address;
 }
 
 
-///////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
 // INSTRUCTIONS
 ///////////////////////////////////////////////////////////////////
 
-byte CPU::ADC(word address)
+void CPU::ADC(word address)
 {
-	auto m = Read(address);
-	word result = reg.a + m + reg.sr.c;
-	reg.sr.c = result > 255;
-	reg.sr.v = !((reg.a ^ m) & 0x80) && ((reg.a ^ result) & 0x80);
-	reg.a = Byte(result);
-	reg.sr.z = reg.a == 0;
-	reg.sr.n = (reg.a & 0x80) > 0;
-	return 0;
+    auto mem = Read(address);
+    word result = a + mem + sr.c;
+    sr.c = result > 255;
+    sr.v = !((a ^ mem) & 0x80) && ((a ^ result) & 0x80);
+    a = ByteLow(result);
+    sr.z = a == 0;
+    sr.n = a >> 7;
 }
 
-byte CPU::AND(word address)
+void CPU::AND(word address)
 {
-	reg.a &= Read(address);
-	reg.sr.z = reg.a == 0;
-	reg.sr.n = (reg.a & 0x80) > 0;
-	return 0;
+    a &= Read(address);
+    sr.z = a == 0;
+    sr.n = a >> 7;
 }
 
-byte CPU::ASL(word address)
+void CPU::ASL(word address)
 {
-	word result = Read(address) << 1;
-	byte t = Byte(result);
-	reg.sr.c = result > 255;
-	reg.sr.z = t == 0;
-	reg.sr.n = (t & 0x80) > 0;
-	Write(address, t);
-	return 0;
+    byte m = Read(address);
+    word result = m << 1;
+    byte t = Byte(result);
+    sr.c = result > 255;
+    sr.z = t == 0;
+    sr.n = t >> 7;
+    Write(address, m);
+    Write(address, t);
 }
 
-byte CPU::ASL_A(word)
+void CPU::ASL_A()
 {
-	word result = reg.a << 1;
-	reg.a = Byte(result);
-	reg.sr.c = result > 255;
-	reg.sr.z = reg.a == 0;
-	reg.sr.n = (reg.a & 0x80) > 0;
-	return 0;
+    Read(pc);
+    word result = a << 1;
+    a = Byte(result);
+    sr.c = result > 255;
+    sr.z = a == 0;
+    sr.n = a >> 7;
 }
 
-byte CPU::BCC(word address)
+void CPU::BRANCH(word address, bool branch)
 {
-	reg.pc += reg.sr.c ? 0 : (sbyte)Read(address);
-	return 0;
+    sbyte offset = Read(address);
+    if (branch) {
+        Read(pc);
+        word new_address = pc + offset;
+        if (ByteHigh(pc) != ByteHigh(new_address)) {
+            Read(pc);
+        }
+        pc = new_address;
+    }
 }
 
-byte CPU::BCS(word address)
+void CPU::BIT(word address)
 {
-	reg.pc += reg.sr.c ? (sbyte)Read(address) : 0;
-	return 0;
+    auto m = Read(address);
+    sr.z = (a & m) ? 0 : 1;
+    sr.v = (m & 0x40) ? 1 : 0;
+    sr.n = (m & 0x80) ? 1 : 0;
 }
 
-byte CPU::BEQ(word address)
+void CPU::BRK(word address)
 {
-	reg.pc += reg.sr.z ? (sbyte)Read(address) : 0;
-	return 0;
+    Read(address);
+    sr.b = 1;
+    auto [h, l] = Bytes(pc);
+    Write(Word(0x01, sp--), h);
+    Write(Word(0x01, sp--), l);
+    Write(Word(0x01, sp--), sr);
+    auto pcl = Read(0xFFFE);
+    auto pch = Read(0xFFFF);
+    pc = Word(pch, pcl);
+    sr.i = 1;
 }
 
-byte CPU::BIT(word address)
+inline void CPU::CLEAR(byte& flag)
 {
-	auto m = Read(address);
-	reg.sr.z = (reg.a & m) ? 0 : 1;
-	reg.sr.v = (m & 0x40) ? 1 : 0;
-	reg.sr.n = (m & 0x80) ? 1 : 0;
-	return 0;
+    Read(pc);
+    flag = 0;
 }
 
-byte CPU::BMI(word address)
+void CPU::COMPARE(word address, byte& reg)
 {
-	reg.pc += reg.sr.n ? (sbyte)Read(address) : 0;
-	return 0;
+    byte m = Read(address);
+    sr.c = reg >= m;
+    sr.z = reg == m;
+    sr.n = ((byte)(reg - m)) >> 7;
 }
 
-byte CPU::BNE(word address)
+void CPU::DEC(word address)
 {
-	reg.pc += reg.sr.z ? 0 : (sbyte)Read(address);
-	return 0;
+    byte m = Read(address);
+    byte t = m - 1;
+    sr.z = t == 0;
+    sr.n = t >> 7;
+    Write(address, m);
+    Write(address, t);
 }
 
-byte CPU::BPL(word address)
+void CPU::DECREMENT(byte& reg)
 {
-	reg.pc += reg.sr.n ? 0 : (sbyte)Read(address);
-	return 0;
+    Read(pc);
+    reg -= 1;
+    sr.z = reg == 0;
+    sr.n = reg >> 7;
 }
 
-byte CPU::BRK(word)
+void CPU::EOR(word address)
 {
-	reg.sr.b = 1;
-	auto [h, l] = Bytes(reg.pc);
-	Write(Word(0x01, reg.sp--), h);
-	Write(Word(0x01, reg.sp--), l);
-	Write(Word(0x01, reg.sp--), reg.sr);
-	reg.pc = Word(Read(0xFFFF), Read(0xFFFE));
-	reg.sr.i = 1;
-	return 0;
+    a ^= Read(address);
+    sr.z = a == 0;
+    sr.n = a >> 7;
 }
 
-byte CPU::BVC(word address)
+void CPU::INC(word address)
 {
-	reg.pc += reg.sr.v ? 0 : (sbyte)Read(address);
-	return 0;
+    byte m = Read(address);
+    byte t = m + 1;
+    sr.z = t == 0;
+    sr.n = t >> 7;
+    Write(address, m);
+    Write(address, t);
 }
 
-byte CPU::BVS(word address)
+void CPU::INCREMENT(byte& reg)
 {
-	reg.pc += reg.sr.v ? (sbyte)Read(address) : 0;
-	return 0;
+    Read(pc);
+    reg += 1;
+    sr.z = reg == 0;
+    sr.n = reg >> 7;
 }
 
-byte CPU::CLC(word)
+void CPU::JMP(word address)
 {
-	reg.sr.c = 0;
-	return 0;
+    pc = address;
 }
 
-byte CPU::CLD(word)
+void CPU::JSR()
 {
-	reg.sr.d = 0;
-	return 0;
+    byte low = Read(pc++);
+    Read(Word(0x01, sp));
+    auto [h, l] = Bytes(pc);
+    Write(Word(0x01, sp--), h);
+    Write(Word(0x01, sp--), l);
+    byte high = Read(pc);
+    pc = Word(high, low);
 }
 
-byte CPU::CLI(word)
+inline void CPU::LOAD(word address, byte& reg)
 {
-	reg.sr.i = 0;
-	return 0;
+    reg = Read(address);
+    sr.z = reg == 0;
+    sr.n = reg >> 7;
 }
 
-byte CPU::CLV(word)
+void CPU::LSR(word address)
 {
-	reg.sr.v = 0;
-	return 0;
+    byte m = Read(address);
+    byte t = m >> 1;
+    sr.c = m & 0x01;
+    sr.z = t == 0;
+    sr.n = t >> 7;
+    Write(address, m);
+    Write(address, t);
 }
 
-byte CPU::CMP(word address)
+void CPU::LSR_A()
 {
-	auto m = Read(address);
-	reg.sr.c = reg.a >= m;
-	reg.sr.z = reg.a == m;
-	reg.sr.n = ((reg.a - m) & 0x80) >> 7;
-	return 0;
+    Read(pc);
+    sr.c = a & 0x01;
+    a = a >> 1;
+    sr.z = a == 0;
+    sr.n = a >> 7;
 }
 
-byte CPU::CPX(word address)
+inline void CPU::NOP()
 {
-	auto m = Read(address);
-	reg.sr.c = reg.x >= m;
-	reg.sr.z = reg.x == m;
-	reg.sr.n = ((reg.x - m) & 0x80) >> 7;
-	return 0;
+    Read(pc);
 }
 
-byte CPU::CPY(word address)
+void CPU::ORA(word address)
 {
-	auto m = Read(address);
-	reg.sr.c = reg.y >= m;
-	reg.sr.z = reg.y == m;
-	reg.sr.n = ((reg.y - m) & 0x80) >> 7;
-	return 0;
+    a |= Read(address);
+    sr.z = a == 0;
+    sr.n = a >> 7;
 }
 
-byte CPU::DEC(word address)
+void CPU::PHA()
 {
-	byte t = Read(address) - 1;
-	reg.sr.z = t == 0;
-	reg.sr.n = (t & 0x80) >> 7;
-	Write(address, t);
-	return 0;
+    Read(pc);
+    Write(Word(0x01, sp--), a);
 }
 
-byte CPU::DEX(word)
+void CPU::PHP()
 {
-	reg.x -= 1;
-	reg.sr.z = reg.x == 0;
-	reg.sr.n = (reg.x & 0x80) >> 7;
-	return 0;
+    Read(pc);
+    sr.b = 1;
+    Write(Word(0x01, sp--), sr);
 }
 
-byte CPU::DEY(word)
+void CPU::PLA()
 {
-	reg.y -= 1;
-	reg.sr.z = reg.y == 0;
-	reg.sr.n = (reg.y & 0x80) >> 7;
-	return 0;
+    Read(pc);
+    Read(Word(0x01, sp++));
+    a = Read(Word(0x01, sp));
+    sr.z = a == 0;
+    sr.n = a >> 7;
 }
 
-byte CPU::EOR(word address)
+void CPU::PLP()
 {
-	reg.a ^= Read(address);
-	reg.sr.z = reg.a == 0;
-	reg.sr.n = (reg.a & 0x80) >> 7;
-	return 0;
+    Read(pc);
+    Read(Word(0x01, sp++));
+    sr = Read(Word(0x01, sp));
 }
 
-byte CPU::INC(word address)
+void CPU::ROL(word address)
 {
-	byte t = Read(address) + 1;
-	reg.sr.z = t == 0;
-	reg.sr.n = (t & 0x80) >> 7;
-	Write(address, t);
-	return 0;
+    byte m = Read(address);
+    word result = (m << 1) | sr.c;
+    byte t = Byte(result);
+    sr.c = result >> 8;
+    sr.z = t == 0;
+    sr.n = t >> 7;
+    Write(address, m);
+    Write(address, t);
 }
 
-byte CPU::INX(word)
+void CPU::ROL_A()
 {
-	reg.x += 1;
-	reg.sr.z = reg.x == 0;
-	reg.sr.n = (reg.x & 0x80) >> 7;
-	return 0;
+    Read(pc);
+    word result = (a << 1) | sr.c;
+    a = Byte(result);
+    sr.c = result >> 8;
+    sr.z = a == 0;
+    sr.n = a >> 7;
 }
 
-byte CPU::INY(word)
+void CPU::ROR(word address)
 {
-	reg.y += 1;
-	reg.sr.z = reg.y == 0;
-	reg.sr.n = (reg.y & 0x80) >> 7;
-	return 0;
+    byte m = Read(address);
+    word result = Word(sr.c, m);
+    byte t = Byte(result >> 1);
+    sr.c = result & 0x01;
+    sr.z = t == 0;
+    sr.n = t >> 7;
+    Write(address, m);
+    Write(address, t);
 }
 
-byte CPU::JMP(word address)
+void CPU::ROR_A()
 {
-	reg.pc = address;
-	return 0;
+    Read(pc);
+    word result = Word(sr.c, a);
+    a = Byte(result >> 1);
+    sr.c = result & 0x01;
+    sr.z = a == 0;
+    sr.n = a >> 7;
 }
 
-byte CPU::JSR(word address)
+void CPU::RTI()
 {
-	auto [h, l] = Bytes(--reg.pc);
-	Write(Word(0x01, reg.sp--), h);
-	Write(Word(0x01, reg.sp--), l);
-	reg.pc = address;
-	return 0;
+    Read(pc);
+    Read(Word(0x01, sp++));
+    sr = Read(Word(0x01, sp++));
+    byte l = Read(Word(0x01, sp++));
+    byte h = Read(Word(0x01, sp));
+    pc = Word(h, l);
 }
 
-byte CPU::LDA(word address)
+void CPU::RTS()
 {
-	reg.a = Read(address);
-	reg.sr.z = reg.a == 0;
-	reg.sr.n = (reg.a & 0x80) >> 7;
-	return 0;
+    Read(pc);
+    Read(Word(0x01, sp++));
+    byte l = Read(Word(0x01, sp++));
+    byte h = Read(Word(0x01, sp));
+    pc = Word(h, l);
+    Read(pc++);
 }
 
-byte CPU::LDX(word address)
+void CPU::SBC(word address)
 {
-	reg.x = Read(address);
-	reg.sr.z = reg.x == 0;
-	reg.sr.n = (reg.x & 0x80) >> 7;
-	return 0;
+    byte m = Read(address);
+    word result = a - m - (1 - sr.c);
+    sr.c = result <= 255;
+    sr.v = ((result ^ a) & 0x80) && ((m ^ a) & 0x80);
+    a = Byte(result);
+    sr.z = a == 0;
+    sr.n = a >> 7;
 }
 
-byte CPU::LDY(word address)
+inline void CPU::SET(byte& flag)
 {
-	reg.y = Read(address);
-	reg.sr.z = reg.y == 0;
-	reg.sr.n = (reg.y & 0x80) >> 7;
-	return 0;
+    Read(pc);
+    flag = 1;
 }
 
-byte CPU::LSR(word address)
+inline void CPU::STORE(word address, byte& reg)
 {
-	byte t = Read(address);
-	reg.sr.c = t & 0x01;
-	t = t >> 1;
-	reg.sr.z = t == 0;
-	reg.sr.n = (t & 0x80) >> 7;
-	Write(address, t);
-	return 0;
+    Write(address, reg);
 }
 
-byte CPU::LSR_A(word)
+void CPU::TRANSFER(byte& from, byte& to)
 {
-	reg.sr.c = reg.a & 0x01;
-	reg.a = reg.a >> 1;
-	reg.sr.z = reg.a == 0;
-	reg.sr.n = (reg.a & 0x80) >> 7;
-	return 0;
+    Read(pc);
+    to = from;
+    sr.z = to == 0;
+    sr.n = to >> 7;
 }
 
-byte CPU::NOP(word)
+void CPU::TXS()
 {
-	return 0;
-}
-
-byte CPU::ORA(word address)
-{
-	reg.a |= Read(address);
-	reg.sr.z = reg.a == 0;
-	reg.sr.n = (reg.a & 0x80) >> 7;
-	return 0;
-}
-
-byte CPU::PHA(word)
-{
-	Write(Word(0x01, reg.sp--), reg.a);
-	return 0;
-}
-
-byte CPU::PHP(word)
-{
-	reg.sr.b = 1;
-	Write(Word(0x01, reg.sp--), reg.sr);
-	return 0;
-}
-
-byte CPU::PLA(word)
-{
-	reg.a = Read(Word(0x01, ++reg.sp));
-	reg.sr.z = reg.a == 0;
-	reg.sr.n = (reg.a & 0x80) >> 7;
-	return 0;
-}
-
-byte CPU::PLP(word)
-{
-	reg.sr = Read(Word(0x01, ++reg.sp));
-	return 0;
-}
-
-byte CPU::ROL(word address)
-{
-	word result = (Read(address) << 1) | reg.sr.c;
-	byte t = Byte(result);
-	reg.sr.c = (result & 0x0100) > 0;
-	reg.sr.z = t == 0;
-	reg.sr.n = (t & 0x80) >> 7;
-	Write(address, t);
-	return 0;
-}
-
-byte CPU::ROL_A(word)
-{
-	word result = (reg.a << 1) | reg.sr.c;
-	reg.a = Byte(result);
-	reg.sr.c = (result & 0x0100) > 0;
-	reg.sr.z = reg.a == 0;
-	reg.sr.n = (reg.a & 0x80) >> 7;
-	return 0;
-}
-
-byte CPU::ROR(word address)
-{
-	word result = Word(reg.sr.c, Read(address));
-	byte t = Byte(result >> 1);
-	reg.sr.c = result & 0x01;
-	reg.sr.z = t == 0;
-	reg.sr.n = (t & 0x80) >> 7;
-	Write(address, t);
-	return 0;
-}
-
-byte CPU::ROR_A(word)
-{
-	word result = Word(reg.sr.c, reg.a);
-	reg.a = Byte(result >> 1);
-	reg.sr.c = result & 0x01;
-	reg.sr.z = reg.a == 0;
-	reg.sr.n = (reg.a & 0x80) >> 7;
-	return 0;
-}
-
-byte CPU::RTI(word)
-{
-	reg.sr = Read(Word(0x01, ++reg.sp));
-	reg.pc = Read(Word(0x01, ++reg.sp));
-	reg.pc |= Read(Word(0x01, ++reg.sp)) << 8;
-	return 0;
-}
-
-byte CPU::RTS(word)
-{
-	reg.pc = Read(Word(0x01, ++reg.sp));
-	reg.pc |= Read(Word(0x01, ++reg.sp)) << 8;
-	reg.pc += 1;
-	return 0;
-}
-
-byte CPU::SBC(word address)
-{
-	word result = reg.a - Read(address) - (1 - reg.sr.c);
-	reg.sr.c = result <= 255;
-	reg.sr.v = ((result ^ reg.a) & 0x80) && ((Read(address) ^ reg.a) & 0x80);
-	reg.a = Byte(result);
-	reg.sr.z = reg.a == 0;
-	reg.sr.n = (reg.a & 0x80) >> 7;
-	return 0;
-}
-
-byte CPU::SEC(word)
-{
-	reg.sr.c = 1;
-	return 0;
-}
-
-byte CPU::SED(word)
-{
-	reg.sr.d = 1;
-	return 0;
-}
-
-byte CPU::SEI(word)
-{
-	reg.sr.i = 1;
-	return 0;
-}
-
-byte CPU::STA(word address)
-{
-	Write(address, reg.a);
-	return 0;
-}
-
-byte CPU::STX(word address)
-{
-	Write(address, reg.x);
-	return 0;
-}
-
-byte CPU::STY(word address)
-{
-	Write(address, reg.y);
-	return 0;
-}
-
-byte CPU::TAX(word)
-{
-	reg.x = reg.a;
-	reg.sr.z = reg.x == 0;
-	reg.sr.n = (reg.x & 0x80) >> 7;
-	return 0;
-}
-
-byte CPU::TAY(word)
-{
-	reg.y = reg.a;
-	reg.sr.z = reg.y == 0;
-	reg.sr.n = (reg.y & 0x80) >> 7;
-	return 0;
-}
-
-byte CPU::TSX(word)
-{
-	reg.x = reg.sp;
-	reg.sr.z = reg.x == 0;
-	reg.sr.n = (reg.x & 0x80) >> 7;
-	return 0;
-}
-
-byte CPU::TXA(word)
-{
-	reg.a = reg.x;
-	reg.sr.z = reg.a == 0;
-	reg.sr.n = (reg.a & 0x80) >> 7;
-	return 0;
-}
-
-byte CPU::TXS(word)
-{
-	reg.sp = reg.x;
-	return 0;
-}
-
-byte CPU::TYA(word)
-{
-	reg.a = reg.y;
-	reg.sr.z = reg.a == 0;
-	reg.sr.n = (reg.a & 0x80) >> 7;
-	return 0;
+    Read(pc);
+    sp = x;
 }
