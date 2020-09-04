@@ -19,7 +19,6 @@ void PPU::RunUntil(nes_time cpu_time)
     nes_time ppu_time = cpu_time * 3;
     nes_time pending_ticks = ppu_time - mCycle;
 
-
     while (pending_ticks > 0) {
         nes_time remaining_in_line = 341 - mTick;
         nes_time to_run = std::min(pending_ticks, remaining_in_line);
@@ -136,7 +135,6 @@ void PPU::PreRender(nes_time start, nes_time ticks)
             mRegV |= (mRegT & 0x7BE0);
         }
         mShift = 7 - mRegX;
-        //for (int i = 0; i < 256; i++) mSprites[i] = 0;
     }
 }
 
@@ -208,7 +206,7 @@ void PPU::LoadSprites()
                 byte palette_index = (sprite.a & 0x3) << 2;
                 word color_addr = 0x3F10 | palette_index | color_index;
 
-                byte color = mBus->PpuRead(color_addr) & 0x3F;
+                byte color = Read(color_addr) & 0x3F;
                 word opaque = (color_index > 0) << 13;
                 word foreground = (!(sprite.a & 0x20)) << 14;
                 word sprite0 = ((i == 0) << 15) & (opaque << 2);
@@ -361,8 +359,8 @@ byte PPU::Read(word address)
 
 word PPU::PatternTable(byte side, word tile, byte row)
 {
-    byte l = mBus->PpuRead((side << 12) | (tile << 4) | (0 << 3) | row);
-    byte h = mBus->PpuRead((side << 12) | (tile << 4) | (1 << 3) | row);
+    byte l = Read((side << 12) | (tile << 4) | (0 << 3) | row);
+    byte h = Read((side << 12) | (tile << 4) | (1 << 3) | row);
 
     word pattern = 0;
     pattern |= (h & 0x80) << 8;
