@@ -15,6 +15,7 @@ using sdword = int32_t;
 using byte = uint8_t;
 using word = uint16_t;
 using dword = uint32_t;
+using nes_time = uint64_t;
 
 
 inline dword Dword(word h, word l)
@@ -30,6 +31,16 @@ inline word Word(byte h, byte l)
 inline byte Byte(word w)
 {
 	return w & 0xFF;
+}
+
+inline byte ByteLow(word w)
+{
+    return w & 0xFF;
+}
+
+inline byte ByteHigh(word w)
+{
+    return w >> 8;
 }
 
 inline std::tuple<byte, byte> Bytes(word w)

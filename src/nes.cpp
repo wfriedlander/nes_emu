@@ -3,6 +3,7 @@
 #include <iostream>
 #include <chrono>
 #include <thread>
+#include <QDebug>
 
 
 NES::NES(IVideo* video, IAudio* audio, IInput* input) : mVideo(video), mAudio(audio), mInput(input)
@@ -39,8 +40,8 @@ json NES::Serialize()
 {
     json state;
     state["bus"] = mBus->mSerializer.Serialize();
-    state["cpu"] = mCPU->mSerializer.Serialize();
-    state["ppu"] = mPPU->mSerializer.Serialize();
+//    state["cpu"] = mCPU->mSerializer.Serialize();
+//    state["ppu"] = mPPU->mSerializer.Serialize();
     state["map"] = mCartridge->mSerializer.Serialize();
     return state;
 }
@@ -48,38 +49,48 @@ json NES::Serialize()
 void NES::Deserialize(json state)
 {
     mBus->mSerializer.Deserialize(state["bus"]);
-    mCPU->mSerializer.Deserialize(state["cpu"]);
-    mPPU->mSerializer.Deserialize(state["ppu"]);
+//    mCPU->mSerializer.Deserialize(state["cpu"]);
+//    mPPU->mSerializer.Deserialize(state["ppu"]);
     mCartridge->mSerializer.Deserialize(state["map"]);
 }
 
 bool NES::Step()
 {
     mDone = false;
-    byte cycles = mCPU->Step();
-	mPPU->Execute(cycles * 3);
-    mAPU->Execute(cycles);
+    nes_time time = mCPU->CurrentCycle();
+    nes_time next = mPPU->MinTimeToNMI();
+    mCPU->RunUntil(time + next);
+    nes_time new_time = mCPU->CurrentCycle();
+    mPPU->RunUntil(new_time);
+    mAPU->Execute(new_time - time);
+
+//    nes_time cycle = mCPU->CurrentCycle();
+//    mCPU->RunUntil(cycle + 1);
+//    word cycles = mCPU->CurrentCycle() - cycle;
+//    qDebug() << cycles;
+//	mPPU->Execute(cycles * 3);
+//    mAPU->Execute(cycles);
     return mDone;
 }
 
 void NES::FrameDone()
 {
-	auto elapsed = std::chrono::high_resolution_clock::now() - mLast;
-//	std::this_thread::sleep_for(std::chrono::milliseconds(16) - elapsed);
-////	auto e = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
-//	std::this_thread::sleep_for(std::chrono::microseconds(mMicro) - elapsed);
-	auto post = std::chrono::high_resolution_clock::now() - mLast;
-	auto p = std::chrono::duration_cast<std::chrono::microseconds>(post).count();
-	mMicro += (16666 - p);
-	mLast = std::chrono::high_resolution_clock::now();
+//	auto elapsed = std::chrono::high_resolution_clock::now() - mLast;
+////	std::this_thread::sleep_for(std::chrono::milliseconds(16) - elapsed);
+//////	auto e = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
+////	std::this_thread::sleep_for(std::chrono::microseconds(mMicro) - elapsed);
+//	auto post = std::chrono::high_resolution_clock::now() - mLast;
+//	auto p = std::chrono::duration_cast<std::chrono::microseconds>(post).count();
+//	mMicro += (16666 - p);
+//	mLast = std::chrono::high_resolution_clock::now();
     mDone = true;
 }
 
 void NES::DebugKey(int key)
 {
 	//std::cout << key << "\n";
-	if (key == 22)
-		mCPU->EnableLogging(true);
-	else if (key == 16)
-		mCPU->EnableLogging(false);
+//	if (key == 22)
+//		mCPU->EnableLogging(true);
+//	else if (key == 16)
+//		mCPU->EnableLogging(false);
 }
