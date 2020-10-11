@@ -109,16 +109,17 @@ void Audio::Process(int16_t *out, int samples)
         mDeltaFill = (mDeltaFill * 0.95) + (mFillLevel - mLastFill) * 0.05;
 
         auto delta = mFillTarget - mFillLevel;
-        auto target_rate = delta / 500;
+        auto target_rate = delta / 300;
 
-        if (mDeltaFill > target_rate) {
-            mClockRate += 500;
-        }
-        else {
-            mClockRate -= 500;
-        }
+//        if (mDeltaFill > target_rate) {
+//            mClockRate += 500;
+//        }
+//        else {
+//            mClockRate -= 500;
+//        }
+        mClockRate += (mDeltaFill - target_rate) * 50;
 
-        qDebug() << mFillLevel << mDeltaFill << mClockRate;
+        qDebug() << mFillLevel << mDeltaFill << target_rate << mClockRate;
 
         mBuffer->clock_rate(mClockRate);
         mStart = now;

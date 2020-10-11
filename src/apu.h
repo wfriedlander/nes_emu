@@ -181,6 +181,56 @@ private:
 };
 
 
+class DMC
+{
+public:
+    DMC(Bus* bus, Blip_Buffer* buffer);
+
+public:
+    void Process(word cycles);
+
+public:
+    void SetEnabled(bool enabled);
+    void SetStart(bool start);
+    void SetIRQ(bool irq);
+    void SetLoop(bool loop);
+    void SetRate(byte rate);
+    void SetSample(byte sample);
+    void SetAddress(byte address);
+    void SetLength(byte length);
+
+private:
+    // DMC
+    Bus* mBus = nullptr;
+    bool mEnabled = false;
+
+    // SYNTH
+    Blip_Synth<blip_med_quality, 127> mSynth;
+
+    // MEMORY READER
+    bool mLoop = false;
+//    bool mSampleEmpty = true;
+    byte mSampleBuffer = 0;
+    word mSamplesRemaining = 0;
+    word mSampleAddress = 0;
+    word mCurrentRemaining = 0;
+    word mCurrentAddress = 0;
+
+    // OUTPUT UNIT
+    bool mSilenced = false;
+    byte mShiftCount = 0;
+//    byte mSample = 0;
+//    byte mLast = 0;
+    byte mOutput = 0;
+    byte mShiftReg = 0;
+
+    // TIMER
+    word mTimer = 0;
+    word mTimerReg = 428;
+    word mPeriodTable[16] = {
+        428, 380, 340, 320, 286, 254, 226, 214, 190, 160, 142, 128, 106, 84, 72, 54
+    };
+};
 
 
 class APU
@@ -240,6 +290,7 @@ private:
     Pulse mPulse1;
     Triangle mTriangle;
     Noise mNoise;
+    DMC mDMC;
 
 
 private:
@@ -247,6 +298,7 @@ private:
     word mFrameCount = 0;
     uint64_t mCycle = 0;
     uint64_t mProcessed = 0;
+    uint64_t mLastProcessed = 0;
     uint64_t mQuarterFrame = 7457;
     uint64_t mHalfFrame = 14914;
 };
