@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <cstdio>
 #include <iostream>
-
+#include <QDebug>
 
 
 
@@ -348,6 +348,113 @@ void Noise::SetPeriod(byte period)
 
 
 
+///////////////////////////////////////////////////////////////////////////
+// DMC
+////////////////////////////////////////////////////
+
+
+DMC::DMC(Bus* bus, Blip_Buffer* buffer) : mBus(bus)
+{
+    mSynth.volume(0.42545 * 0.5);
+    mSynth.output(buffer);
+}
+
+
+void DMC::Process(word cycles)
+{
+    blip_time_t time = 0;
+    mSynth.update(0, mOutput);
+
+    while (cycles > 0)
+    {
+        auto m = std::min(cycles, mTimer);
+        cycles -= m;
+        mTimer -= m;
+        time += m;
+
+        if (mTimer == 0)
+        {
+            mTimer = mTimerReg;
+
+            if (!mSilenced) {
+                bool add = mShiftReg & 0x01;
+                if (add && mOutput < 126) {
+                    mOutput += 2;
+                }
+                else if (!add && mOutput > 1) {
+                    mOutput -= 2;
+                }
+            }
+
+
+            mSynth.update(time, mOutput);
+
+            mShiftReg = mShiftReg >> 1;
+
+            if (--mShiftCount == 0) {
+                mShiftCount = 8;
+
+                if (mLoop && !mCurrentRemaining) {
+                    mCurrentRemaining = mSamplesRemaining;
+                    mCurrentAddress = mSampleAddress;
+                }
+
+                if (mCurrentRemaining > 0) {
+                    mSilenced = false;
+                    mShiftReg = mBus->CpuRead(mCurrentAddress);
+                    mCurrentAddress = (mCurrentAddress + 1) | 0x8000;
+                    mCurrentRemaining -= 1;
+                }
+                else {
+                    mSilenced = true;
+                }
+            }
+        }
+    }
+}
+
+void DMC::SetEnabled(bool enabled)
+{
+    if (enabled && !mCurrentRemaining) {
+        mCurrentRemaining = mSamplesRemaining;
+        mCurrentAddress = mSampleAddress;
+    }
+    else if (!enabled) {
+        mCurrentRemaining = 0;
+    }
+}
+
+void DMC::SetIRQ(bool irq)
+{
+
+}
+
+void DMC::SetLoop(bool loop)
+{
+    mLoop = loop;
+}
+
+void DMC::SetRate(byte rate)
+{
+    mTimerReg = mPeriodTable[rate];
+}
+
+void DMC::SetSample(byte sample)
+{
+    mOutput = sample;
+}
+
+void DMC::SetAddress(byte address)
+{
+    mSampleAddress = 0xC000 | (address << 6);
+}
+
+void DMC::SetLength(byte length)
+{
+    mSamplesRemaining = (length << 4) | 1;
+}
+
+
 
 ///////////////////////////////////////////////////////////////////////////
 // APU
@@ -355,7 +462,7 @@ void Noise::SetPeriod(byte period)
 
 
 
-APU::APU(Bus* bus) : mBus(bus), mPulse0(&mBuffer, 0), mPulse1(&mBuffer, 1), mTriangle(&mBuffer), mNoise(&mBuffer)
+APU::APU(Bus* bus) : mBus(bus), mPulse0(&mBuffer, 0), mPulse1(&mBuffer, 1), mTriangle(&mBuffer), mNoise(&mBuffer), mDMC(bus, &mBuffer)
 {
 //    mBuffer.clock_rate(1789773);
 //    mBuffer.set_sample_rate(48000);
@@ -421,7 +528,8 @@ void APU::HalfFrame()
 
 void APU::FrameDone()
 {
-
+//    qDebug() << "samples processed" << mCycle << mCycle - mLastProcessed << mCycle - mProcessed;
+    mLastProcessed = mCycle;
 }
 
 void APU::Reset()
@@ -518,17 +626,27 @@ void APU::RegisterWrite(word address, byte value)
 
         // DMC REGISTERS
     case 0x10:
+        mDMC.SetIRQ(value & 0x80);
+        mDMC.SetLoop(value & 0x40);
+        mDMC.SetRate(value & 0x0F);
+        break;
     case 0x11:
+        mDMC.SetSample(value & 0x7F);
+        break;
     case 0x12:
+        mDMC.SetAddress(value);
+        break;
     case 0x13:
+        mDMC.SetLength(value);
         break;
 
         // STATUS REGISTER
     case 0x15:
-        mPulse0.SetEnabled(value & 1);
-        mPulse1.SetEnabled(value & 2);
-        mTriangle.SetEnabled(value & 4);
-        mNoise.SetEnabled(value & 8);
+        mPulse0.SetEnabled(value & 0x01);
+        mPulse1.SetEnabled(value & 0x02);
+        mTriangle.SetEnabled(value & 0x04);
+        mNoise.SetEnabled(value & 0x08);
+        mDMC.SetEnabled(value & 0x10);
         break;
 
         // FRAME COUNTER REGISTER
@@ -554,7 +672,10 @@ void APU::ProcessSamples(word cycles)
     mPulse1.Process(cycles);
     mTriangle.Process(cycles);
     mNoise.Process(cycles);
+    mDMC.Process(cycles);
     mBuffer.end_frame(cycles);
     mProcessed += cycles;
 }
+
+
 
