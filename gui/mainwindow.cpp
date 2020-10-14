@@ -113,10 +113,10 @@ void MainWindow::VideoSettings()
 void MainWindow::ControllerSettings()
 {
 //	ControllerInput* settings = new ControllerInput();
-    auto settings = new SettingsController();
+    auto settings = SettingsController(this);
 //	settings->getInput(mInput);
 //    settings->setWindowTitle("Change Controller Settings");
-    settings->show();
+    qDebug() << "SETTINGS" << settings.exec();
 }
 
 void MainWindow::About()

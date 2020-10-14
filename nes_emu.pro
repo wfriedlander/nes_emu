@@ -44,6 +44,7 @@ HEADERS += \
     core/cpu.h \
     core/mappers.h \
     core/ppu.h \
+    core/serializer.h \
     gui/audio.h \
     gui/controllerinput.h \
     gui/gameloader.h \
@@ -56,8 +57,7 @@ HEADERS += \
     include/common.h \
     include/interface.h \
     include/json.h \
-    include/nes.h \
-    include/serializer.h
+    include/nes.h
 
 FORMS += \
     gui/controllerinput.ui \

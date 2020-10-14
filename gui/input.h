@@ -6,6 +6,8 @@
 
 #include "interface.h"
 
+
+
 class Input : public QWidget, public IInput
 {
     Q_OBJECT

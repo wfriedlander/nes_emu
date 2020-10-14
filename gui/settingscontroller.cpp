@@ -248,7 +248,7 @@ ControllerPanel::ControllerPanel(const QString& title, QWidget *parent) : QWidge
 SettingsController::SettingsController(QWidget *parent) : QDialog(parent)
 {
     setWindowTitle("Controller Settings");
-    resize(1000, 800);
+    resize(1000, 875);
 
     auto main_layout = new QVBoxLayout(this);
 
@@ -270,6 +270,9 @@ SettingsController::SettingsController(QWidget *parent) : QDialog(parent)
     dialog_layout->addWidget(cancel);
 
     main_layout->addLayout(dialog_layout);
+
+    connect(accept, &QPushButton::clicked, this, &QDialog::accept);
+    connect(cancel, &QPushButton::clicked, this, &QDialog::reject);
 
     auto k = new Keyboard(this);
 //    connect(k, &Keyboard::KeyDown, [controller1](KEY key){if (key == KEY::A) controller1->display->PressButton(0);});
