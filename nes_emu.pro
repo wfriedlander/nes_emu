@@ -16,50 +16,54 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    src/apu.cpp \
-    src/audio.cpp \
-    src/blipbuffer.cpp \
-    src/bus.cpp \
-    src/cartridge.cpp \
-    src/controller.cpp \
-    src/controllerinput.cpp \
-    src/cpu.cpp \
-    src/gameloader.cpp \
-    src/gamewindow.cpp \
-    src/input.cpp \
-    src/main.cpp \
-    src/mainwindow.cpp \
-    src/mappers.cpp \
-    src/nes.cpp \
-    src/ppu.cpp \
-    src/serializer.cpp \
-    src/video.cpp
+    core/apu.cpp \
+    core/blipbuffer.cpp \
+    core/bus.cpp \
+    core/cartridge.cpp \
+    core/controller.cpp \
+    core/cpu.cpp \
+    core/mappers.cpp \
+    core/nes.cpp \
+    core/ppu.cpp \
+    core/serializer.cpp \
+    gui/audio.cpp \
+    gui/controllerinput.cpp \
+    gui/gameloader.cpp \
+    gui/gamewindow.cpp \
+    gui/input.cpp \
+    gui/keyboard.cpp \
+    gui/main.cpp \
+    gui/mainwindow.cpp \
+    gui/settingscontroller.cpp \
+    gui/video.cpp
 
 HEADERS += \
-    src/apu.h \
-    src/audio.h \
-    src/blipbuffer.h \
-    src/bus.h \
-    src/cartridge.h \
-    src/common.h \
-    src/controller.h \
-    src/controllerinput.h \
-    src/cpu.h \
-    src/gameloader.h \
-    src/gamewindow.h \
-    src/input.h \
-    src/interface.h \
-    src/json.h \
-    src/mainwindow.h \
-    src/mappers.h \
-    src/nes.h \
-    src/ppu.h \
-    src/serializer.h \
-    src/video.h
+    core/apu.h \
+    core/bus.h \
+    core/cartridge.h \
+    core/controller.h \
+    core/cpu.h \
+    core/mappers.h \
+    core/ppu.h \
+    gui/audio.h \
+    gui/controllerinput.h \
+    gui/gameloader.h \
+    gui/gamewindow.h \
+    gui/input.h \
+    gui/keyboard.h \
+    gui/mainwindow.h \
+    gui/settingscontroller.h \
+    gui/video.h \
+    include/blipbuffer.h \
+    include/common.h \
+    include/interface.h \
+    include/json.h \
+    include/nes.h \
+    include/serializer.h
 
 FORMS += \
-    src/controllerinput.ui \
-    src/test.ui
+    gui/controllerinput.ui \
+    gui/test.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -72,5 +76,10 @@ win32:CONFIG(release, debug|release): LIBS += -L$$PWD/extlib/windows/x86/release
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/extlib/windows/x86/debug/ -lportaudio_static_x86
 else:unix: LIBS += -L$$PWD/extlib/linux/x86/ -lportaudio_static_x86
 
-INCLUDEPATH += $$PWD/extlib/include
+INCLUDEPATH += $$PWD/extlib/include $$PWD/include
 DEPENDPATH += $$PWD/extlib/include
+
+RESOURCES += \
+    resources/resources.qrc
+
+RC_ICONS = nes_icon.ico

@@ -1,12 +1,12 @@
 #pragma once
 
 #include "common.h"
-#include "bus.h"
-#include "cpu.h"
-#include "ppu.h"
-#include "apu.h"
-#include "cartridge.h"
-#include "controller.h"
+#include "core/bus.h"
+#include "core/cpu.h"
+#include "core/ppu.h"
+#include "core/apu.h"
+#include "core/cartridge.h"
+#include "core/controller.h"
 #include "interface.h"
 #include "json.h"
 

@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+//#include "keyboard.h"
 
 #include <QApplication>
 #include <QSurfaceFormat>
@@ -17,6 +18,9 @@ int main(int argc, char *argv[])
     QSurfaceFormat::setDefaultFormat(format);
 
     MainWindow w;
+
+//    Keyboard k(&a);
+
     w.show();
     return a.exec();
 }

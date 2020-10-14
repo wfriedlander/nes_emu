@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include "input.h"
+
 namespace Ui {
 class ControllerInput;
 }
@@ -36,6 +37,14 @@ private slots:
 private:
     Ui::ControllerInput *ui;
     Input *mInput;
+
+//protected:
+//    void paintEvent(QPaintEvent* event) override;
 };
+
+
+
+
+
 
 #endif // CONTROLLERINPUT_H

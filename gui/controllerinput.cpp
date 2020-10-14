@@ -3,18 +3,21 @@
 #include <QDebug>
 #include <QKeyEvent>
 
+
 #include "input.h"
 #include "mainwindow.h"
+#include "settingscontroller.h"
 
 
-ControllerInput::ControllerInput(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::ControllerInput)
+ControllerInput::ControllerInput(QWidget *parent) : QWidget(parent)//, ui(new Ui::ControllerInput)
 {
     qDebug() << "test";
+//    resize(700+64, 300+64);
+//    setFixedSize(764, 364);
    // mInput.MapButton(66, Input::Button::A);
     state = '0';
-    ui->setupUi(this);
+//    auto a = new ControllerPanel(this);
+//    ui->setupUi(this);
 }
 
 void ControllerInput::getInput(Input *input)
@@ -24,7 +27,7 @@ void ControllerInput::getInput(Input *input)
 
 ControllerInput::~ControllerInput()
 {
-   // delete ui;
+   delete ui;
 }
 
 void ControllerInput::on_A_clicked()
@@ -111,3 +114,5 @@ void ControllerInput::keyPressEvent(QKeyEvent *event)
 //    qDebug() << event->text();
 //    qDebug() << event->key();
 }
+
+
