@@ -29,7 +29,6 @@ SOURCES += \
     gui/audio.cpp \
     gui/controllerinput.cpp \
     gui/gameloader.cpp \
-    gui/gamewindow.cpp \
     gui/input.cpp \
     gui/keyboard.cpp \
     gui/main.cpp \
@@ -48,7 +47,6 @@ HEADERS += \
     gui/audio.h \
     gui/controllerinput.h \
     gui/gameloader.h \
-    gui/gamewindow.h \
     gui/input.h \
     gui/keyboard.h \
     gui/mainwindow.h \
