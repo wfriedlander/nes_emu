@@ -1,6 +1,8 @@
 #ifndef SETTINGSCONTROLLER_H
 #define SETTINGSCONTROLLER_H
 
+#include "interface_input.h"
+
 #include <QWidget>
 #include <QDialog>
 #include <QPushButton>
@@ -44,7 +46,14 @@ public:
     void ShowButton(int pad, int button, bool active);
 
 public:
-    ControllerDisplay* display;
+
+
+signals:
+    void TypeChanged(QString);
+    void SavePreset(int);
+    void LoadPreset(int);
+    void AssignButton(Button, QPushButton*);
+
 };
 
 
@@ -52,9 +61,19 @@ class SettingsController : public QDialog
 {
     Q_OBJECT
 public:
-    explicit SettingsController(QWidget *parent = nullptr);
+    explicit SettingsController(InputDevices* devices, QWidget *parent = nullptr);
+
+private slots:
+    void ReceiveInput(InputDevice* device, int code);
+    void AssignButton(Button button, QPushButton* pbutton);
+
+private:
+    InputDevices* mDevices;
+    ControllerInfo mInfo[2];
 
 
+
+    QPushButton* mSelected;
 };
 
 #endif // SETTINGSCONTROLLER_H

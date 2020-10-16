@@ -1,15 +1,17 @@
-#include "settingscontroller.h"
+#include "settings_controller.h"
 #include "keyboard.h"
 
 #include <QPaintEvent>
 #include <QPainter>
-#include <QComboBox>
+#include <QTimer>
 #include <QGridLayout>
-#include <QGroupBox>
 #include <QHBoxLayout>
-#include <QLabel>
-#include <QSpacerItem>
 #include <QVBoxLayout>
+#include <QSpacerItem>
+#include <QButtonGroup>
+#include <QGroupBox>
+#include <QComboBox>
+#include <QLabel>
 #include <QDebug>
 
 
@@ -164,6 +166,22 @@ void ControllerDisplay::paintEvent(QPaintEvent *)
 }
 
 
+static QString ButtonToString(Button button)
+{
+    switch (button)
+    {
+    case Button::Up: return "Up";
+    case Button::Down: return "Down";
+    case Button::Left: return "Left";
+    case Button::Right: return "Right";
+    case Button::Start: return "Start";
+    case Button::Select: return "Select";
+    case Button::A: return "A";
+    case Button::B: return "B";
+    }
+}
+
+
 ControllerPanel::ControllerPanel(const QString& title, QWidget *parent) : QWidget(parent)
 {
     auto main_layout = new QHBoxLayout(this);
@@ -177,6 +195,7 @@ ControllerPanel::ControllerPanel(const QString& title, QWidget *parent) : QWidge
     auto type_label = new QLabel("Type", settings);
     type_layout->addWidget(type_label);
     auto type_combo = new QComboBox(settings);
+    type_combo->addItems({"None", "Standard", "Zapper"});
     type_layout->addWidget(type_combo);
     settings_layout->addLayout(type_layout);
 
@@ -184,55 +203,42 @@ ControllerPanel::ControllerPanel(const QString& title, QWidget *parent) : QWidge
     auto preset_label = new QLabel("Preset", settings);
     preset_layout->addWidget(preset_label);
     auto preset_combo = new QComboBox(settings);
+    preset_combo->addItems({"1", "2", "3", "4", "5"});
     preset_layout->addWidget(preset_combo);
     settings_layout->addLayout(preset_layout);
 
     auto save_load_layout = new QHBoxLayout();
     auto preset_load = new QPushButton("Load", settings);
+    preset_load->setAutoDefault(false);
     save_load_layout->addWidget(preset_load);
     auto preset_save = new QPushButton("Save", settings);
+    preset_save->setAutoDefault(false);
     save_load_layout->addWidget(preset_save);
     settings_layout->addLayout(save_load_layout);
 
+//    auto button_group = new QButtonGroup(settings);
     auto button_box = new QGroupBox("Buttons", settings);
     auto button_box_layout = new QGridLayout(button_box);
-    auto up_label = new QLabel("Up", button_box);
-    button_box_layout->addWidget(up_label, 0, 0, 1, 1);
-    auto up_button = new QPushButton(button_box);
-    button_box_layout->addWidget(up_button, 0, 1, 1, 1);
-    auto left_label = new QLabel("Left", button_box);
-    button_box_layout->addWidget(left_label, 1, 0, 1, 1);
-    auto left_button = new QPushButton(button_box);
-    button_box_layout->addWidget(left_button, 1, 1, 1, 1);
-    auto right_label = new QLabel("Right", button_box);
-    button_box_layout->addWidget(right_label, 2, 0, 1, 1);
-    auto right_button = new QPushButton(button_box);
-    button_box_layout->addWidget(right_button, 2, 1, 1, 1);
-    auto down_label = new QLabel("Down", button_box);
-    button_box_layout->addWidget(down_label, 3, 0, 1, 1);
-    auto down_button = new QPushButton(button_box);
-    button_box_layout->addWidget(down_button, 3, 1, 1, 1);
-    auto start_label = new QLabel("Start", button_box);
-    button_box_layout->addWidget(start_label, 4, 0, 1, 1);
-    auto start_button = new QPushButton(button_box);
-    button_box_layout->addWidget(start_button, 4, 1, 1, 1);
-    auto select_label = new QLabel("Select", button_box);
-    button_box_layout->addWidget(select_label, 5, 0, 1, 1);
-    auto select_button = new QPushButton(button_box);
-    button_box_layout->addWidget(select_button, 5, 1, 1, 1);
-    auto a_label = new QLabel("A", button_box);
-    button_box_layout->addWidget(a_label, 6, 0, 1, 1);
-    auto a_button = new QPushButton(button_box);
-    button_box_layout->addWidget(a_button, 6, 1, 1, 1);
-    auto b_label = new QLabel("B", button_box);
-    button_box_layout->addWidget(b_label, 7, 0, 1, 1);
-    auto b_button = new QPushButton(button_box);
-    button_box_layout->addWidget(b_button, 7, 1, 1, 1);
+
+
+
+    for (auto& b : {Button::Up, Button::Down, Button::Left, Button::Right, Button::Start, Button::Select, Button::A, Button::B})
+    {
+        int i = static_cast<int>(b);
+        auto label = new QLabel(ButtonToString(b), button_box);
+        button_box_layout->addWidget(label, i, 0, 1, 1);
+        auto button = new QPushButton(button_box);
+        button->setAutoDefault(false);
+        button->setCheckable(true);
+        button_box_layout->addWidget(button, i, 1, 1, 1);
+//        button_group->addButton(button);
+        connect(button, &QPushButton::toggled, [=](bool t) { if (t) emit AssignButton(b, button);});
+    }
 
     settings_layout->addWidget(button_box);
     main_box_layout->addWidget(settings);
 
-    display = new ControllerDisplay(main_box);
+    ControllerDisplay* display = new ControllerDisplay(main_box);
     QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     display->setSizePolicy(sizePolicy);
     display->setMinimumSize(QSize(700, 300));
@@ -245,39 +251,74 @@ ControllerPanel::ControllerPanel(const QString& title, QWidget *parent) : QWidge
 
 
 
-SettingsController::SettingsController(QWidget *parent) : QDialog(parent)
+SettingsController::SettingsController(InputDevices* devices, QWidget *parent) : QDialog(parent), mDevices(devices)
 {
     setWindowTitle("Controller Settings");
     resize(1000, 875);
 
     auto main_layout = new QVBoxLayout(this);
-
     auto controller1 = new ControllerPanel("Controller 1", this);
     main_layout->addWidget(controller1);
-
     auto controller2 = new ControllerPanel("Controller 2", this);
     main_layout->addWidget(controller2);
-
     auto dialog_layout = new QHBoxLayout();
-
     auto spacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
     dialog_layout->addItem(spacer);
-
     auto accept = new QPushButton("Accept", this);
     dialog_layout->addWidget(accept);
-
+    accept->setDefault(true);
     auto cancel = new QPushButton("Cancel", this);
     dialog_layout->addWidget(cancel);
-
     main_layout->addLayout(dialog_layout);
 
     connect(accept, &QPushButton::clicked, this, &QDialog::accept);
     connect(cancel, &QPushButton::clicked, this, &QDialog::reject);
 
-    auto k = new Keyboard(this);
+    connect(controller1, &ControllerPanel::AssignButton, this, &SettingsController::AssignButton);
+
+//    connect(mDevices, &InputDevices::PushInput, this, &SettingsController::ReceiveInput);
+//    auto k = new Keyboard(this);
 //    connect(k, &Keyboard::KeyDown, [controller1](KEY key){if (key == KEY::A) controller1->display->PressButton(0);});
 //    connect(k, &Keyboard::KeyUp, [controller1](KEY key){if (key == KEY::A) controller1->display->ReleaseButton(0);});
-//    controller1->display->PressButton(0);
+    //    controller1->display->PressButton(0);
+}
+
+void SettingsController::ReceiveInput(InputDevice *device, int code)
+{
+//    qDebug() << "Receive" << device << code << mSelected;
+
+
+//    ButtonMap bm {device, code};
+
+
+
+//    mSelected->setChecked(false);
+//    mSelected = nullptr;
+}
+
+void SettingsController::AssignButton(Button button, QPushButton *pbutton)
+{
+    if (mSelected) {
+        mSelected->setChecked(false);
+    }
+    qDebug() << "Assign" << ButtonToString(button) << pbutton;
+    mSelected = pbutton;
+
+
+    auto const connection = new QMetaObject::Connection;
+    *connection = connect(mDevices, &InputDevices::PushInput, [=](InputDevice* d, int c){
+        qDebug() << "Receive" << d << c << (int)button << pbutton;
+        pbutton->setChecked(false);
+        disconnect(*connection);
+        delete connection;
+    });
+
+
+
+
+    mDevices->GetImmediateInput();
+
+//    startTimer(5000);
 }
 
 

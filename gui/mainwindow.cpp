@@ -11,12 +11,12 @@
 
 
 #include "mainwindow.h"
-#include "video.h"
-#include "input.h"
-#include "audio.h"
+#include "interface_video.h"
+#include "interface_input.h"
+#include "interface_audio.h"
 #include "controllerinput.h"
 #include "gameloader.h"
-#include "settingscontroller.h"
+#include "settings_controller.h"
 
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
@@ -29,6 +29,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     mNes = new NES(mVideo, mAudio, mInput);
     mLoader = new GameLoader(mNes);
+    mInputDevices = new InputDevices(this);
 
     UpdateRecents();
 
@@ -113,7 +114,7 @@ void MainWindow::VideoSettings()
 void MainWindow::ControllerSettings()
 {
 //	ControllerInput* settings = new ControllerInput();
-    auto settings = SettingsController(this);
+    auto settings = SettingsController(mInputDevices, this);
 //	settings->getInput(mInput);
 //    settings->setWindowTitle("Change Controller Settings");
     qDebug() << "SETTINGS" << settings.exec();
@@ -161,13 +162,6 @@ void MainWindow::RunFrame()
         QTimer::singleShot(ms, Qt::TimerType::PreciseTimer, this, &MainWindow::RunFrame);
         while(!mNes->Step());
     }
-}
-
-bool MainWindow::eventFilter(QObject *obj, QEvent *event)
-{
-    if (event->type() != QEvent::MouseMove)
-        qDebug() << obj << event->type();
-    return false;
 }
 
 void MainWindow::SetupUI()

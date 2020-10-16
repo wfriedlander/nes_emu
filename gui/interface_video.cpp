@@ -1,4 +1,4 @@
-#include "video.h"
+#include "interface_video.h"
 
 #include <QImage>
 

@@ -5,6 +5,7 @@
 
 #include "nes.h"
 
+class InputDevices;
 class GameLoader;
 class Input;
 class Audio;
@@ -37,9 +38,6 @@ private:
     void RunFrame();
     void UpdateRecents();
 
-protected:
-    bool eventFilter(QObject *obj, QEvent *event) override;;
-
 private:
     void SetupUI();
 
@@ -49,7 +47,8 @@ private:
     Audio* mAudio = nullptr;
     Video* mVideo = nullptr;
     NES* mNes = nullptr;
-    QMenu* mRecent;
+    QMenu* mRecent = nullptr;
+    InputDevices* mInputDevices = nullptr;
 
 private:
     bool mPlaying = false;

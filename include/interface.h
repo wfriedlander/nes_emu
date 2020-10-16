@@ -31,21 +31,31 @@ public:
     virtual void SetBuffer(Blip_Buffer* buffer) = 0;
 };
 
-struct ButtonState
+
+
+enum class Button : int
 {
-	bool a;
-	bool b;
-	bool select;
-	bool start;
-	bool up;
-	bool down;
-	bool left;
-	bool right;
+    A = 0,
+    B,
+    Start,
+    Select,
+    Up,
+    Down,
+    Left,
+    Right
 };
+
+struct ControllerState
+{
+    bool& operator[](Button b) {return button_state[static_cast<int>(b)];}
+private:
+    bool button_state[8];
+};
+
 
 class IInput
 {
 public:
-    virtual const ButtonState& InputUpdate() = 0;
+    virtual ControllerState GetController(int controller) = 0;
 };
 

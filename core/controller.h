@@ -15,11 +15,11 @@ public:
 	void RegisterWrite(byte value);
 
 private:
-	void Latch();
+    void Latch();
 
 private:
     IInput* mInput = nullptr;
-	byte state0 = 0;
-	byte state1 = 0;
+    byte mStateLatch0 = 0;
+    byte mStateLatch1 = 0;
 };
 
