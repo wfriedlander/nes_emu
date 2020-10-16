@@ -306,8 +306,8 @@ void SettingsController::AssignButton(Button button, QPushButton *pbutton)
 
 
     auto const connection = new QMetaObject::Connection;
-    *connection = connect(mDevices, &InputDevices::PushInput, [=](InputDevice* d, int c){
-        qDebug() << "Receive" << d << c << (int)button << pbutton;
+    *connection = connect(mDevices, &InputDevices::PushInput, [=](InputMap im){
+        qDebug() << "Receive" << im.device << im.code << (int)button << pbutton;
         pbutton->setChecked(false);
         disconnect(*connection);
         delete connection;

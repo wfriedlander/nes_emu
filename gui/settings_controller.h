@@ -73,7 +73,7 @@ private:
 
 
 
-    QPushButton* mSelected;
+    QPushButton* mSelected = nullptr;
 };
 
 #endif // SETTINGSCONTROLLER_H
