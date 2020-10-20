@@ -7,6 +7,24 @@
 
 
 
+QString ButtonToString(Button button)
+{
+    switch (button)
+    {
+    case Button::Up: return "Up";
+    case Button::Down: return "Down";
+    case Button::Left: return "Left";
+    case Button::Right: return "Right";
+    case Button::Start: return "Start";
+    case Button::Select: return "Select";
+    case Button::A: return "A";
+    case Button::B: return "B";
+    }
+}
+
+
+
+
 InputDevices::InputDevices(QObject *parent) : QObject(parent)
 {
     mDevices.push_back(new Keyboard(this));
@@ -60,8 +78,7 @@ ControllerState Input::GetController(int controller)
     ControllerInfo& info = mControllers[controller];
     for (auto& b : {Button::A, Button::B, Button::Start, Button::Select, Button::Up, Button::Down, Button::Left, Button::Right})
     {
-        auto& input = info.mapping[b];
-        state[b] = input.IsActive();
+        state[b] = info[b].IsActive();
     }
     return state;
 }

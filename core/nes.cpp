@@ -1,5 +1,12 @@
 #include "nes.h"
 
+#include "bus.h"
+#include "cpu.h"
+#include "ppu.h"
+#include "apu.h"
+#include "cartridge.h"
+#include "controller.h"
+
 #include <iostream>
 #include <chrono>
 #include <thread>
@@ -39,19 +46,21 @@ void NES::ResetGame()
 json NES::Serialize()
 {
     json state;
-    state["bus"] = mBus->mSerializer.Serialize();
-//    state["cpu"] = mCPU->mSerializer.Serialize();
-//    state["ppu"] = mPPU->mSerializer.Serialize();
-    state["map"] = mCartridge->mSerializer.Serialize();
+    state["bus"] = mBus->Serialize();
+    state["cpu"] = mCPU->Serialize();
+    state["ppu"] = mPPU->Serialize();
+    state["apu"] = mAPU->Serialize();
+    state["map"] = mCartridge->Serialize();
     return state;
 }
 
 void NES::Deserialize(json state)
 {
-    mBus->mSerializer.Deserialize(state["bus"]);
-//    mCPU->mSerializer.Deserialize(state["cpu"]);
-//    mPPU->mSerializer.Deserialize(state["ppu"]);
-    mCartridge->mSerializer.Deserialize(state["map"]);
+    mBus->Deserialize(state["bus"]);
+    mCPU->Deserialize(state["cpu"]);
+    mPPU->Deserialize(state["ppu"]);
+    mAPU->Deserialize(state["apu"]);
+    mCartridge->Deserialize(state["map"]);
 }
 
 bool NES::Step()

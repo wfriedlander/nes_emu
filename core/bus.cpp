@@ -3,7 +3,7 @@
 
 Bus::Bus() : mCpuRam(2048)
 {
-    mSerializer.RegisterField("cpu_ram", mCpuRam.data(), 2048);
+    RegisterField("cpu_ram", mCpuRam.data(), 2048);
 }
 
 void Bus::Initialize(NES* nes, CPU* cpu, PPU* ppu, APU* apu, Controller* control)

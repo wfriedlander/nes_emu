@@ -1,12 +1,39 @@
 #include "ppu.h"
 
-#include <iostream>
-#include <algorithm>
+#include "bus.h"
+
+//#include <iostream>
+//#include <algorithm>
 
 
 PPU::PPU(Bus* bus) : mBus(bus)
 {
-
+    RegisterField("control", &mControlReg);
+    RegisterField("mask", &mMaskReg);
+    RegisterField("status", &mStatusReg);
+    RegisterField("regt", &mRegT);
+    RegisterField("regv", &mRegV);
+    RegisterField("regx", &mRegX);
+    RegisterField("regy", &mRegY);
+    RegisterField("regw", &mRegW);
+    RegisterField("cycle", &mCycle);
+    RegisterField("end", &mFrameEnd);
+    RegisterField("frame", &mFrame);
+    RegisterField("line", &mLine);
+    RegisterField("tick", &mTick);
+    RegisterField("latch", &mLatch);
+    RegisterField("write", &mFirstWrite);
+    RegisterField("vaddr", &mVaddr);
+    RegisterField("vbuffer", &mVbuffer);
+    RegisterField("oamaddr", &mAddrOAM);
+    RegisterField("oam", (byte*)&mOAM, 256);
+    RegisterField("screen", (byte*)&mScreen, 240*256);
+    RegisterField("sprites", (byte*)&mSprites, 256);
+    RegisterField("palette", &mPalette);
+    RegisterField("patternhigh", &mPatternHigh);
+    RegisterField("patternlow", &mPatternLow);
+    RegisterField("pattern", &mPattern);
+    RegisterField("shift", &mShift);
 }
 
 void PPU::SetVideoBackend(IVideo* video)

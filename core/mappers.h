@@ -4,15 +4,15 @@
 #include "cartridge.h"
 
 
-template <int N>
-struct CartSegment
-{
-	operator char* ()
-	{
-		return reinterpret_cast<char*>(&mem[0]);
-	}
-	byte mem[N];
-};
+//template <int N>
+//struct CartSegment
+//{
+//	operator char* ()
+//	{
+//		return reinterpret_cast<char*>(&mem[0]);
+//	}
+//	byte mem[N];
+//};
 
 
 class Mapper : public Cartridge

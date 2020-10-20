@@ -1,5 +1,4 @@
 #include "mainwindow.h"
-//#include "keyboard.h"
 
 #include <QApplication>
 #include <QSurfaceFormat>
@@ -11,6 +10,8 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     QDir::setCurrent(QFileInfo(argv[0]).absolutePath());
+    QDir::current().mkpath("Saves");
+    QDir::current().mkpath("SaveStates");
 
     QSurfaceFormat format;
     format.setVersion(3, 3);
@@ -18,9 +19,7 @@ int main(int argc, char *argv[])
     QSurfaceFormat::setDefaultFormat(format);
 
     MainWindow w;
-
-//    Keyboard k(&a);
-
     w.show();
+
     return a.exec();
 }

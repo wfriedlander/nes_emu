@@ -16,7 +16,7 @@
 #include "interface_audio.h"
 #include "controllerinput.h"
 #include "gameloader.h"
-#include "settings_controller.h"
+#include "configure_controller.h"
 
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
@@ -114,7 +114,7 @@ void MainWindow::VideoSettings()
 void MainWindow::ControllerSettings()
 {
 //	ControllerInput* settings = new ControllerInput();
-    auto settings = SettingsController(mInputDevices, this);
+    auto settings = ControllerWindow(mInputDevices, this);
 //	settings->getInput(mInput);
 //    settings->setWindowTitle("Change Controller Settings");
     qDebug() << "SETTINGS" << settings.exec();

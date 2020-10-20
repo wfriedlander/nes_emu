@@ -1,7 +1,6 @@
 #pragma once
 
 #include "common.h"
-#include "bus.h"
 #include "interface.h"
 #include "serializer.h"
 
@@ -9,9 +8,9 @@
 class Bus;
 
 
-class PPU
+class PPU : public Serializable
 {
-    struct ppuctrl //write only
+    struct ppuctrl : reg //write only
     {
         byte v = 0;     // generate NMI
         byte p = 0;     // master/slave
@@ -21,8 +20,9 @@ class PPU
         byte i = 0;     // VRAM address increment per CPU read/write of PPUDATA (0: add 1, going across; 1: add 32, going down)
         byte n = 0;     // Base nametable address (0 = $2000; 1 = $2400; 2 = $2800; 3 = $2C00)
         void operator =(byte val) { v = (val >> 7) & 0x01; p = (val >> 6) & 0x01; h = (val >> 5) & 0x01; b = (val >> 4) & 0x01; s = (val >> 3) & 0x01; i = (val >> 2) & 0x01; n = val & 0x03; }
+        operator byte() const { return (v << 7) | (p << 6) | (h << 5) | (b << 4) | (s << 3) | (i << 2) | (n << 0); }
     };
-    struct ppumask //write only
+    struct ppumask : reg //write only
     {
         byte eb = 0;    // emphasize blue
         byte eg = 0;    // emphasize green
@@ -33,8 +33,9 @@ class PPU
         byte ub = 0;    // unmask left 8 background pixels
         byte gs = 0;    // grayscale
         void operator =(byte val) { eb = (val >> 7) & 0x01; eg = (val >> 6) & 0x01; er = (val >> 5) & 0x01; ss = (val >> 4) & 0x01; sb = (val >> 3) & 0x01; us = (val >> 2) & 0x01; ub = (val >> 1) & 0x01; gs = val & 0x01; }
+        operator byte() const { return (eb << 7) | (eg << 6) | (er << 5) | (ss << 4) | (sb << 3) | (us << 2) | (ub << 1) | (gs << 0); }
     };
-    struct ppustatus //read only
+    struct ppustatus : reg //read only
     {
         byte v = 0;     // vertical blank started
         byte s = 0;     // sprite 0 hit

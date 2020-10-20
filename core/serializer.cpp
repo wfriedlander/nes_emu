@@ -66,7 +66,7 @@ void base64_decode(std::string string, byte* bytes)
 }
 
 
-json Serializer::Serialize()
+json Serializable::Serialize()
 {
     json state;
     for (auto& item : mItems)
@@ -81,6 +81,12 @@ json Serializer::Serialize()
         case Type::WORD:
             state[item.name] = *static_cast<word*>(item.pointer);
             break;
+        case Type::DWORD:
+            state[item.name] = *static_cast<dword*>(item.pointer);
+            break;
+        case Type::TIME:
+            state[item.name] = *static_cast<nes_time*>(item.pointer);
+            break;
         case Type::BOOL:
             state[item.name] = *static_cast<bool*>(item.pointer);
             break;
@@ -88,14 +94,14 @@ json Serializer::Serialize()
             state[item.name] = base64_encode(static_cast<byte*>(item.pointer), item.length);
             break;
         case Type::SERIALIZER:
-            state[item.name] = static_cast<Serializer*>(item.pointer)->Serialize();
+            state[item.name] = static_cast<Serializable*>(item.pointer)->Serialize();
             break;
         }
     }
     return state;
 }
 
-void Serializer::Deserialize(json state)
+void Serializable::Deserialize(json state)
 {
     for (auto& item : mItems)
     {
@@ -111,6 +117,12 @@ void Serializer::Deserialize(json state)
             case Type::WORD:
                 *static_cast<word*>(item.pointer) = state[item.name];
                 break;
+            case Type::DWORD:
+                *static_cast<dword*>(item.pointer) = state[item.name];
+                break;
+            case Type::TIME:
+                *static_cast<nes_time*>(item.pointer) = state[item.name];
+                break;
             case Type::BOOL:
                 *static_cast<bool*>(item.pointer) = state[item.name];
                 break;
@@ -118,7 +130,7 @@ void Serializer::Deserialize(json state)
                 base64_decode(state[item.name], static_cast<byte*>(item.pointer));
                 break;
             case Type::SERIALIZER:
-                static_cast<Serializer*>(item.pointer)->Deserialize(state[item.name]);
+                static_cast<Serializable*>(item.pointer)->Deserialize(state[item.name]);
                 break;
             }
         }
@@ -129,32 +141,42 @@ void Serializer::Deserialize(json state)
     }
 }
 
-void Serializer::RegisterField(std::string name, reg *value)
+void Serializable::RegisterField(std::string name, reg *value)
 {
     mItems.push_back(Item {Type::REG, name, value});
 }
 
-void Serializer::RegisterField(std::string name, byte *value)
+void Serializable::RegisterField(std::string name, byte *value)
 {
     mItems.push_back(Item {Type::BYTE, name, value});
 }
 
-void Serializer::RegisterField(std::string name, word *value)
+void Serializable::RegisterField(std::string name, word *value)
 {
     mItems.push_back(Item {Type::WORD, name, value});
 }
 
-void Serializer::RegisterField(std::string name, bool *value)
+void Serializable::RegisterField(std::string name, dword *value)
+{
+    mItems.push_back(Item {Type::DWORD, name, value});
+}
+
+void Serializable::RegisterField(std::string name, nes_time *value)
+{
+    mItems.push_back(Item {Type::TIME, name, value});
+}
+
+void Serializable::RegisterField(std::string name, bool *value)
 {
     mItems.push_back(Item {Type::BOOL, name, value});
 }
 
-void Serializer::RegisterField(std::string name, byte *value, int length)
+void Serializable::RegisterField(std::string name, byte *value, int length)
 {
     mItems.push_back(Item {Type::BYTE_ARRAY, name, value, length});
 }
 
-void Serializer::RegisterField(std::string name, Serializer *value)
+void Serializable::RegisterField(std::string name, Serializable *value)
 {
     mItems.push_back(Item {Type::SERIALIZER, name, value});
 }

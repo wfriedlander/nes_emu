@@ -8,6 +8,8 @@
 #include <QObject>
 
 
+QString ButtonToString(Button button);
+
 
 struct InputMap;
 
@@ -56,15 +58,9 @@ struct InputMap
     int code = 0;
 
     bool IsActive() {return device == nullptr ? false : device->IsCodeActive(code);}
+    QString Name() {return device == nullptr ? "" : device->CodeToString(code);}
 };
 
-
-struct ControllerMap
-{
-    InputMap& operator[](Button b) {return dev[static_cast<int>(b)];}
-private:
-    InputMap dev[8];
-};
 
 enum class ControllerType
 {
@@ -76,7 +72,9 @@ enum class ControllerType
 struct ControllerInfo
 {
     ControllerType type = ControllerType::None;
-    ControllerMap mapping;
+    InputMap& operator[](Button b) {return dev[static_cast<int>(b)];}
+private:
+    InputMap dev[8];
 };
 
 

@@ -307,7 +307,7 @@ unsigned int Keyboard::KeyToNative(Key key)
     case Key::ScrollLock:   return VK_SCROLL;
     case Key::NumLock:      return VK_NUMLOCK;
     case Key::CapsLock:     return VK_CAPITAL;
-    case Key::Unknown:      return 0;
+    default:                return 0;
     }
 }
 

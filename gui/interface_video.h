@@ -7,6 +7,28 @@
 #include "interface.h"
 
 
+
+enum class Filter
+{
+    None,
+    NTSC,
+    xBRZ,
+    HQ,
+    Scale,
+    SaI2x,
+    SuperEagle,
+    SuperSaI2x
+};
+
+enum class AspectRatio
+{
+    Standard,
+    Widescreen,
+    Custom
+};
+
+
+
 class Video : public QOpenGLWidget, protected QOpenGLExtraFunctions, public IVideo
 {
     Q_OBJECT

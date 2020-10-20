@@ -13,7 +13,7 @@
 class NES;
 
 
-class Bus
+class Bus : public Serializable
 {
 public:
 	Bus();
@@ -45,6 +45,4 @@ private:
 private:
 	std::vector<byte> mCpuRam;
 
-public:
-    Serializer mSerializer;
 };

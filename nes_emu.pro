@@ -26,6 +26,10 @@ SOURCES += \
     core/nes.cpp \
     core/ppu.cpp \
     core/serializer.cpp \
+    gui/configure_audio.cpp \
+    gui/configure_controller.cpp \
+    gui/configure_general.cpp \
+    gui/configure_video.cpp \
     gui/controllerinput.cpp \
     gui/gameloader.cpp \
     gui/gamepad.cpp \
@@ -35,7 +39,7 @@ SOURCES += \
     gui/keyboard.cpp \
     gui/main.cpp \
     gui/mainwindow.cpp \
-    gui/settings_controller.cpp
+    gui/storage.cpp
 
 HEADERS += \
     core/apu.h \
@@ -46,6 +50,10 @@ HEADERS += \
     core/mappers.h \
     core/ppu.h \
     core/serializer.h \
+    gui/configure_audio.h \
+    gui/configure_controller.h \
+    gui/configure_general.h \
+    gui/configure_video.h \
     gui/controllerinput.h \
     gui/gameloader.h \
     gui/gamepad.h \
@@ -54,7 +62,8 @@ HEADERS += \
     gui/interface_video.h \
     gui/keyboard.h \
     gui/mainwindow.h \
-    gui/settings_controller.h \
+    gui/settings.h \
+    gui/storage.h \
     include/blipbuffer.h \
     include/common.h \
     include/interface.h \

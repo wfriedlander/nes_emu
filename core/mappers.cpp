@@ -26,8 +26,8 @@ Mapper::Mapper(CartridgeConfig& config, std::ifstream& rom) : mPpuRam(2048), mPa
 	mPersistent = config.persistent;
 	mFourScreen = config.four_screen;
 
-    mSerializer.RegisterField("ppuram", mPpuRam.data(), 2048);
-    mSerializer.RegisterField("palette", mPaletteRam.data(), 32);
+    RegisterField("ppuram", mPpuRam.data(), 2048);
+    RegisterField("palette", mPaletteRam.data(), 32);
 }
 
 

@@ -1,22 +1,28 @@
 #pragma once
 
 #include "common.h"
-#include "bus.h"
 #include "interface.h"
 #include "blipbuffer.h"
+#include "serializer.h"
 
 
+class Bus;
 
-class LengthCounter
+
+class LengthCounter : public Serializable
 {
+public:
+    LengthCounter();
+
+public:
+    void Tick();
+    bool Silenced();
+
 public:
     void SetEnabled(bool enabled);
     void SetHalted(bool halted);
     void SetLength(byte length);
 
-protected:
-    void TickLengthCounter();
-    bool Silenced();
 
 private:
     bool mEnabled = false;
@@ -37,17 +43,21 @@ private:
 };
 
 
-class Envelope
+class Envelope : public Serializable
 {
+public:
+    Envelope();
+
+public:
+    void Tick();
+    byte Volume();
+
 public:
     void SetEnvelope(byte value);
     void SetConstantVolume(bool constant);
     void SetLoopFlag(bool loop);
     void SetStartFlag();
 
-protected:
-    void TickEnvelope();
-    byte Volume();
 
 private:
     bool mLoopFlag = false;
@@ -59,25 +69,31 @@ private:
 };
 
 
-class Pulse : public LengthCounter, public Envelope
+//class Pulse : public LengthCounter, public Envelope, public Serializable
+class Pulse : public Serializable
 {
 public:
     Pulse(Blip_Buffer* buffer, byte channel);
 
 public:
+    void SetEnabled(bool enabled);
+    void WriteReg0(byte value);
+    void WriteReg1(byte value);
+    void WriteReg2(byte value);
+    void WriteReg3(byte value);
     void QuarterFrame();
     void HalfFrame();
     void Process(word cycles);
 
-public:
-    void SetDuty(byte duty);
-    void SetSweep(byte sweep);
-    void SetTimerHigh(byte period);
-    void SetTimerLow(byte period);
-
 private:
     // SYNTH
     Blip_Synth<blip_good_quality, 15> mSynth;
+
+    // LENGTH COUNTER
+    LengthCounter mLengthCounter;
+
+    // ENVELOPE
+    Envelope mEnvelope;
 
     // TIMER
     word mTimer = 0;
@@ -106,26 +122,26 @@ private:
 };
 
 
-class Triangle : public LengthCounter
+class Triangle : public Serializable
 {
 public:
     Triangle(Blip_Buffer* buffer);
 
 public:
+    void SetEnabled(bool enabled);
+    void WriteReg0(byte value);
+    void WriteReg2(byte value);
+    void WriteReg3(byte value);
     void QuarterFrame();
     void HalfFrame();
     void Process(word cycles);
 
-public:
-    void SetControlFlag(bool flag);
-    void SetCounter(byte value);
-    void SetTimerHigh(byte period);
-    void SetTimerLow(byte period);
-    void SetCounterReloadFlag();
-
 private:
     // SYNTH
     Blip_Synth<blip_good_quality, 15> mSynth;
+
+    // LENGTH COUNTER
+    LengthCounter mLengthCounter;
 
     // TIMER
     word mTimer = 0;
@@ -149,23 +165,29 @@ private:
 
 
 
-class Noise: public LengthCounter, public Envelope
+class Noise: public Serializable
 {
 public:
     Noise(Blip_Buffer* buffer);
 
 public:
+    void SetEnabled(bool enabled);
+    void WriteReg0(byte value);
+    void WriteReg2(byte value);
+    void WriteReg3(byte value);
     void QuarterFrame();
     void HalfFrame();
     void Process(word cycles);
 
-public:
-    void SetMode(bool mode);
-    void SetPeriod(byte period);
-
 private:
     // SYNTH
     Blip_Synth<blip_med_quality, 15> mSynth;
+
+    // LENGTH COUNTER
+    LengthCounter mLengthCounter;
+
+    // ENVELOPE
+    Envelope mEnvelope;
 
     // SHIFT
     byte mShiftMode = 13;
@@ -181,12 +203,16 @@ private:
 };
 
 
-class DMC
+class DMC : public Serializable
 {
 public:
     DMC(Bus* bus, Blip_Buffer* buffer);
 
 public:
+    void WriteReg0(byte value);
+    void WriteReg1(byte value);
+    void WriteReg2(byte value);
+    void WriteReg3(byte value);
     void Process(word cycles);
 
 public:
@@ -209,7 +235,6 @@ private:
 
     // MEMORY READER
     bool mLoop = false;
-//    bool mSampleEmpty = true;
     byte mSampleBuffer = 0;
     word mSamplesRemaining = 0;
     word mSampleAddress = 0;
@@ -219,8 +244,6 @@ private:
     // OUTPUT UNIT
     bool mSilenced = false;
     byte mShiftCount = 0;
-//    byte mSample = 0;
-//    byte mLast = 0;
     byte mOutput = 0;
     byte mShiftReg = 0;
 
@@ -233,31 +256,15 @@ private:
 };
 
 
-class APU
+class APU : public Serializable
 {
-    struct pulse // write only
-    {
-        byte d = 0;    // duty cycle
-        byte l = 0;    // length counter halt
-        byte c = 0;    // constant volume
-        byte v = 0;    // volume/envelope divider period
-        void operator =(byte val) { d = (val >> 6) & 3; l = (val >> 5) & 1; c = (val >> 4) & 1; l = (val >> 0) & 15; }
-    };
 
-    struct pulsesweep // write only
-    {
-        byte e = 0;    //
-        byte p = 0;    //
-        byte n = 0;    //
-        byte s = 0;    //
-        void operator =(byte val) { e = (val >> 7) & 1; p = (val >> 4) & 7; n = (val >> 3) & 1; s = (val >> 0) & 7; }
-    };
-
-    struct framecount // write only
+    struct framecount : reg // write only
     {
         byte m = 0;    // sequencer mode - 0: 4 step; 1: 5 step
         byte i = 0;    // interrupt inhibit
         void operator =(byte val) { m = (val >> 7) & 1; i = (val >> 6) & 1; }
+        operator byte() const { return (m << 7) | (i << 6); }
     };
 
 

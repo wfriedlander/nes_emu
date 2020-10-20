@@ -48,7 +48,6 @@ inline std::tuple<byte, byte> Bytes(word w)
 	return std::make_tuple<byte, byte>((w & 0xFF00) >> 8, w & 0xFF);
 }
 
-
 struct reg {
     virtual operator byte() const = 0;
     virtual void operator =(byte val) = 0;

@@ -1,19 +1,16 @@
 #pragma once
 
-#include <cstdio>
-
 #include "common.h"
-#include "bus.h"
+#include "serializer.h"
 
 
 class Bus;
 
-class CPU
+class CPU : public Serializable
 {
 
 public:
-    CPU(Bus* bus) : mBus(bus) { fopen_s(&log, "log4.txt", "w"); }
-    ~CPU() { fclose(log); }
+    CPU(Bus* bus);
 
 public:
     void Reset();
@@ -31,7 +28,7 @@ private:
     byte Read(word address);
 
 private:
-    struct status
+    struct status : reg
     {
         byte n = 0;     // Negative
         byte v = 0;     // Overflow
@@ -52,7 +49,6 @@ private:
     word pc = 0;
 
 public:
-    FILE* log = nullptr;
     Bus* mBus = nullptr;
     nes_time mCycle = 0;
     bool mNMI = false;

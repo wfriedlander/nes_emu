@@ -1,6 +1,20 @@
 #include "cpu.h"
+#include "bus.h"
 
-#include <QDebug>
+
+CPU::CPU(Bus* bus) : mBus(bus)
+{
+    RegisterField("sr", &sr);
+    RegisterField("a", &a);
+    RegisterField("x", &x);
+    RegisterField("y", &y);
+    RegisterField("sp", &sp);
+    RegisterField("pc", &pc);
+    RegisterField("cycle", &mCycle);
+    RegisterField("nmi", &mNMI);
+    RegisterField("irq", &mIRQ);
+}
+
 
 void CPU::Reset()
 {
