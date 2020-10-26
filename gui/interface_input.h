@@ -90,10 +90,10 @@ public:
     explicit Input(QObject *parent = nullptr);
 
 public:
-    ControllerState GetController(int controller) override;
+    ControllerState GetState(int controller) override;
 
 public:
-    void SetController(int controller, ControllerInfo info);
+    ControllerInfo* Controllers();
 
 private:
     ControllerInfo mControllers[2];

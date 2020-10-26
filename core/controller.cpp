@@ -38,7 +38,7 @@ void Controller::RegisterWrite(byte value)
 
 void Controller::Latch()
 {
-    auto state0 = mInput->GetController(0);
+    auto state0 = mInput->GetState(0);
 
     mStateLatch0 = 0;
     mStateLatch0 |= state0[Button::A] ? 0x80 : 0;
@@ -50,7 +50,7 @@ void Controller::Latch()
     mStateLatch0 |= state0[Button::Left] ? 0x02 : 0;
     mStateLatch0 |= state0[Button::Right] ? 0x01 : 0;
 
-    auto state1 = mInput->GetController(1);
+    auto state1 = mInput->GetState(1);
 
     mStateLatch1 = 0;
     mStateLatch1 |= state1[Button::A] ? 0x80 : 0;

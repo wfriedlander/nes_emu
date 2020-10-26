@@ -22,6 +22,7 @@ public:
     explicit ControllerDisplay(QWidget *parent = nullptr);
 
 public slots:
+    void ResetButtonState();
     void SetButtonState(Button button, bool state);
 
 signals:
@@ -50,10 +51,14 @@ class ControllerPanel : public QWidget
 {
     Q_OBJECT
 public:
-    explicit ControllerPanel(const QString& title, QWidget *parent = nullptr);
+    explicit ControllerPanel(int id, ControllerInfo& info, QWidget *parent = nullptr);
 
 public:
-    void SetButtonState(Button button, bool active);
+    void ResetDisplayButtons();
+    void SetDisplayButton(Button button, bool active);
+
+private slots:
+    void DisplayPressed(Button button, QPushButton* pushbutton);
 
 signals:
     void TypeChanged(QString);
@@ -77,18 +82,26 @@ class ControllerWindow : public QDialog
 {
     Q_OBJECT
 public:
-    explicit ControllerWindow(InputDevices* devices, QWidget *parent = nullptr);
+    explicit ControllerWindow(InputDevices* devices, ControllerInfo* controllers, QWidget *parent = nullptr);
+
+public:
+    ControllerInfo* Controllers();
 
 private slots:
     void AssignButton(int controller, Button button, QPushButton* pbutton);
     void SavePreset(int controller, int preset);
     void LoadPreset(int controller, int preset);
 
+protected:
+    void timerEvent(QTimerEvent* event);
+
 private:
+    int poll_id = -1;
     QTimer* mTimer;
     InputDevices* mDevices;
     ControllerInfo mInfo[2];
 
+    ControllerPanel* mPanel[2];
 
 
     QPushButton* mSelected = nullptr;

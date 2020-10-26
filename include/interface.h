@@ -44,6 +44,6 @@ private:
 class IInput
 {
 public:
-    virtual ControllerState GetController(int controller) = 0;
+    virtual ControllerState GetState(int controller) = 0;
 };
 

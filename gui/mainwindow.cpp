@@ -113,11 +113,14 @@ void MainWindow::VideoSettings()
 
 void MainWindow::ControllerSettings()
 {
-//	ControllerInput* settings = new ControllerInput();
-    auto settings = ControllerWindow(mInputDevices, this);
-//	settings->getInput(mInput);
-//    settings->setWindowTitle("Change Controller Settings");
-    qDebug() << "SETTINGS" << settings.exec();
+    ControllerInfo* ci = mInput->Controllers();
+    auto settings = ControllerWindow(mInputDevices, ci, this);
+    auto change = settings.exec();
+    if (change) {
+        auto nci = settings.Controllers();
+        ci[0] = nci[0];
+        ci[1] = nci[1];
+    }
 }
 
 void MainWindow::About()

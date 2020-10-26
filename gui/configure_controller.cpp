@@ -28,116 +28,126 @@ ControllerDisplay::ControllerDisplay(QWidget *parent) : QWidget(parent)
     up = new QPushButton(this);
     up->setGeometry(96, 108, 56, 42);
     up->setFocusPolicy(Qt::NoFocus);
-    up->setCheckable(true);
     up->setStyleSheet(R"ss(
-        QPushButton         {background: rgb(0, 0, 0); border-radius: 0px; border-style: none;}
-        QPushButton:hover   {background: qlineargradient(x1:0, y1:0.5, x2:0, y2:1, stop:0 rgba(40, 40, 40, 255), stop:1 rgba(0, 0, 0, 255));}
-        QPushButton:pressed {background: qlineargradient(x1:0, y1:0.5, x2:0, y2:1, stop:0 rgba(80, 80, 80, 255), stop:1 rgba(0, 0, 0, 255));}
-        QPushButton:checked {background: qlineargradient(x1:0, y1:0.5, x2:0, y2:1, stop:0 rgba(80, 80, 80, 255), stop:1 rgba(0, 0, 0, 255));}
+        QPushButton          {background: rgb(0, 0, 0); border-radius: 0px; border-style: none;}
+        QPushButton:hover    {background: qlineargradient(x1:0, y1:0.5, x2:0, y2:1, stop:0 rgba(40, 40, 40, 255), stop:1 rgba(0, 0, 0, 255));}
+        QPushButton:pressed  {background: qlineargradient(x1:0, y1:0.5, x2:0, y2:1, stop:0 rgba(80, 80, 80, 255), stop:1 rgba(0, 0, 0, 255));}
+        QPushButton:disabled {background: qlineargradient(x1:0, y1:0.5, x2:0, y2:1, stop:0 rgba(80, 80, 80, 255), stop:1 rgba(0, 0, 0, 255));}
     )ss");
-    connect(up, &QPushButton::clicked, [this](bool checked){if (checked) emit ButtonPressed(Button::Up, up);});
+    connect(up, &QPushButton::clicked, [this](){emit ButtonPressed(Button::Up, up);});
 
 
     down = new QPushButton(this);
     down->setGeometry(96, 206, 56, 42);
     down->setFocusPolicy(Qt::NoFocus);
-    down->setCheckable(true);
     down->setStyleSheet(R"ss(
-        QPushButton         {background: rgb(0, 0, 0); border-radius: 0px; border-style: none;}
-        QPushButton:hover   {background: qlineargradient(x1:0, y1:0.5, x2:0, y2:0, stop:0 rgba(40, 40, 40, 255), stop:1 rgba(0, 0, 0, 255));}
-        QPushButton:pressed {background: qlineargradient(x1:0, y1:0.5, x2:0, y2:0, stop:0 rgba(80, 80, 80, 255), stop:1 rgba(0, 0, 0, 255));}
-        QPushButton:checked {background: qlineargradient(x1:0, y1:0.5, x2:0, y2:0, stop:0 rgba(80, 80, 80, 255), stop:1 rgba(0, 0, 0, 255));}
+        QPushButton          {background: rgb(0, 0, 0); border-radius: 0px; border-style: none;}
+        QPushButton:hover    {background: qlineargradient(x1:0, y1:0.5, x2:0, y2:0, stop:0 rgba(40, 40, 40, 255), stop:1 rgba(0, 0, 0, 255));}
+        QPushButton:pressed  {background: qlineargradient(x1:0, y1:0.5, x2:0, y2:0, stop:0 rgba(80, 80, 80, 255), stop:1 rgba(0, 0, 0, 255));}
+        QPushButton:disabled {background: qlineargradient(x1:0, y1:0.5, x2:0, y2:0, stop:0 rgba(80, 80, 80, 255), stop:1 rgba(0, 0, 0, 255));}
         )ss");
-    connect(up, &QPushButton::clicked, [this](bool checked){if (checked) emit ButtonPressed(Button::Down, down);});
+    connect(down, &QPushButton::clicked, [this](){emit ButtonPressed(Button::Down, down);});
 
     left = new QPushButton(this);
     left->setGeometry(54, 150, 56, 56);
     left->setFocusPolicy(Qt::NoFocus);
-    left->setCheckable(true);
     left->setStyleSheet(R"ss(
-        QPushButton         {background: rgb(0, 0, 0); border-radius: 0px; border-style: none;}
-        QPushButton:hover   {background: qlineargradient(x1:0.5, y1:0, x2:0.8, y2:0, stop:0 rgba(40, 40, 40, 255), stop:1 rgba(0, 0, 0, 255));}
-        QPushButton:pressed {background: qlineargradient(x1:0.5, y1:0, x2:0.8, y2:0, stop:0 rgba(80, 80, 80, 255), stop:1 rgba(0, 0, 0, 255));}
-        QPushButton:checked {background: qlineargradient(x1:0.5, y1:0, x2:0.8, y2:0, stop:0 rgba(80, 80, 80, 255), stop:1 rgba(0, 0, 0, 255));}
+        QPushButton          {background: rgb(0, 0, 0); border-radius: 0px; border-style: none;}
+        QPushButton:hover    {background: qlineargradient(x1:0.5, y1:0, x2:0.8, y2:0, stop:0 rgba(40, 40, 40, 255), stop:1 rgba(0, 0, 0, 255));}
+        QPushButton:pressed  {background: qlineargradient(x1:0.5, y1:0, x2:0.8, y2:0, stop:0 rgba(80, 80, 80, 255), stop:1 rgba(0, 0, 0, 255));}
+        QPushButton:disabled {background: qlineargradient(x1:0.5, y1:0, x2:0.8, y2:0, stop:0 rgba(80, 80, 80, 255), stop:1 rgba(0, 0, 0, 255));}
         )ss");
-    connect(up, &QPushButton::clicked, [this](bool checked){if (checked) emit ButtonPressed(Button::Left, left);});
+    connect(left, &QPushButton::clicked, [this](){emit ButtonPressed(Button::Left, left);});
 
     right = new QPushButton(this);
     right->setGeometry(138, 150, 56, 56);
     right->setFocusPolicy(Qt::NoFocus);
-    right->setCheckable(true);
     right->setStyleSheet(R"ss(
-        QPushButton         {background: rgb(0, 0, 0); border-radius: 0px; border-style: none;}
-        QPushButton:hover   {background: qlineargradient(x1:0.5, y1:0, x2:0.2, y2:0, stop:0 rgba(40, 40, 40, 255), stop:1 rgba(0, 0, 0, 255));}
-        QPushButton:pressed {background: qlineargradient(x1:0.5, y1:0, x2:0.2, y2:0, stop:0 rgba(80, 80, 80, 255), stop:1 rgba(0, 0, 0, 255));}
-        QPushButton:checked {background: qlineargradient(x1:0.5, y1:0, x2:0.2, y2:0, stop:0 rgba(80, 80, 80, 255), stop:1 rgba(0, 0, 0, 255));}
+        QPushButton          {background: rgb(0, 0, 0); border-radius: 0px; border-style: none;}
+        QPushButton:hover    {background: qlineargradient(x1:0.5, y1:0, x2:0.2, y2:0, stop:0 rgba(40, 40, 40, 255), stop:1 rgba(0, 0, 0, 255));}
+        QPushButton:pressed  {background: qlineargradient(x1:0.5, y1:0, x2:0.2, y2:0, stop:0 rgba(80, 80, 80, 255), stop:1 rgba(0, 0, 0, 255));}
+        QPushButton:disabled {background: qlineargradient(x1:0.5, y1:0, x2:0.2, y2:0, stop:0 rgba(80, 80, 80, 255), stop:1 rgba(0, 0, 0, 255));}
         )ss");
-    connect(up, &QPushButton::clicked, [this](bool checked){if (checked) emit ButtonPressed(Button::Right, right);});
+    connect(right, &QPushButton::clicked, [this](){emit ButtonPressed(Button::Right, right);});
 
     select = new QPushButton(this);
     select->setGeometry(249, 200, 55, 20);
     select->setFocusPolicy(Qt::NoFocus);
-    select->setCheckable(true);
     select->setStyleSheet(R"ss(
-        QPushButton {background: rgb(60, 60, 60); border-radius: 6px; border-style: none;}
-        QPushButton:hover {background: rgb(40, 40, 40);}
-        QPushButton:pressed {background: rgb(20, 20, 20);}
-        QPushButton:checked {background: rgb(20, 20, 20);}
+        QPushButton          {background: rgb(60, 60, 60); border-radius: 6px; border-style: none;}
+        QPushButton:hover    {background: rgb(40, 40, 40);}
+        QPushButton:pressed  {background: rgb(20, 20, 20);}
+        QPushButton:disabled {background: rgb(20, 20, 20);}
         )ss");
-    connect(up, &QPushButton::clicked, [this](bool checked){if (checked) emit ButtonPressed(Button::Select, select);});
+    connect(select, &QPushButton::clicked, [this](){emit ButtonPressed(Button::Select, select);});
 
     start = new QPushButton(this);
     start->setGeometry(344, 200, 55, 20);
     start->setFocusPolicy(Qt::NoFocus);
-    start->setCheckable(true);
     start->setStyleSheet(R"ss(
-        QPushButton {background: rgb(60, 60, 60); border-radius: 6px; border-style: none;}
-        QPushButton:hover {background: rgb(40, 40, 40);}
-        QPushButton:pressed {background: rgb(20, 20, 20);}
-        QPushButton:checked {background: rgb(20, 20, 20);}
+        QPushButton          {background: rgb(60, 60, 60); border-radius: 6px; border-style: none;}
+        QPushButton:hover    {background: rgb(40, 40, 40);}
+        QPushButton:pressed  {background: rgb(20, 20, 20);}
+        QPushButton:disabled {background: rgb(20, 20, 20);}
         )ss");
-    connect(up, &QPushButton::clicked, [this](bool checked){if (checked) emit ButtonPressed(Button::Start, start);});
+    connect(start, &QPushButton::clicked, [this](){emit ButtonPressed(Button::Start, start);});
 
     b = new QPushButton(this);
     b->setGeometry(456, 174, 74, 74);
     b->setFocusPolicy(Qt::NoFocus);
-    b->setCheckable(true);
     b->setStyleSheet(R"ss(
-        QPushButton {background: rgb(196, 16, 16); border-radius: 37px; border-style: none;}
-        QPushButton:hover {background: rgb(176, 16, 16);}
-        QPushButton:pressed {background: rgb(150, 8, 8);}
-        QPushButton:checked {background: rgb(150, 8, 8);}
+        QPushButton          {background: rgb(196, 16, 16); border-radius: 37px; border-style: none;}
+        QPushButton:hover    {background: rgb(176, 16, 16);}
+        QPushButton:pressed  {background: rgb(150, 8, 8);}
+        QPushButton:disabled {background: rgb(150, 8, 8);}
         )ss");
-    connect(up, &QPushButton::clicked, [this](bool checked){if (checked) emit ButtonPressed(Button::B, b);});
+    connect(b, &QPushButton::clicked, [this](){emit ButtonPressed(Button::B, b);});
 
     a = new QPushButton(this);
     a->setGeometry(548, 174, 74, 74);
     a->setFocusPolicy(Qt::NoFocus);
-    a->setCheckable(true);
     a->setStyleSheet(R"ss(
-        QPushButton {background: rgb(196, 16, 16); border-radius: 37px; border-style: none;}
-        QPushButton:hover {background: rgb(176, 16, 16);}
-        QPushButton:pressed {background: rgb(150, 8, 8);}
-        QPushButton:checked {background: rgb(150, 8, 8);}
+        QPushButton          {background: rgb(196, 16, 16); border-radius: 37px; border-style: none;}
+        QPushButton:hover    {background: rgb(176, 16, 16);}
+        QPushButton:pressed  {background: rgb(150, 8, 8);}
+        QPushButton:disabled {background: rgb(150, 8, 8);}
         )ss");
-    connect(up, &QPushButton::clicked, [this](bool checked){if (checked) emit ButtonPressed(Button::A, a);});
+    connect(a, &QPushButton::clicked, [this](){emit ButtonPressed(Button::A, a);});
+}
+
+void ControllerDisplay::ResetButtonState()
+{
+    up->setDisabled(false);
+    down->setDisabled(false);
+    left->setDisabled(false);
+    right->setDisabled(false);
+    start->setDisabled(false);
+    select->setDisabled(false);
+    a->setDisabled(false);
+    b->setDisabled(false);
+    qApp->postEvent(up, new QFocusEvent(QEvent::Leave));
+    qApp->postEvent(down, new QFocusEvent(QEvent::Leave));
+    qApp->postEvent(left, new QFocusEvent(QEvent::Leave));
+    qApp->postEvent(right, new QFocusEvent(QEvent::Leave));
+    qApp->postEvent(start, new QFocusEvent(QEvent::Leave));
+    qApp->postEvent(select, new QFocusEvent(QEvent::Leave));
+    qApp->postEvent(a, new QFocusEvent(QEvent::Leave));
+    qApp->postEvent(b, new QFocusEvent(QEvent::Leave));
 }
 
 void ControllerDisplay::SetButtonState(Button button, bool state)
 {
-    blockSignals(true);
     switch (button)
     {
-    case Button::Up: up->setChecked(state); break;
-    case Button::Down: down->setChecked(state); break;
-    case Button::Left: left->setChecked(state); break;
-    case Button::Right: right->setChecked(state); break;
-    case Button::Start: start->setChecked(state); break;
-    case Button::Select: select->setChecked(state); break;
-    case Button::A: a->setChecked(state); break;
-    case Button::B: b->setChecked(state); break;
+    case Button::Up: up->setDisabled(state); break;
+    case Button::Down: down->setDisabled(state); break;
+    case Button::Left: left->setDisabled(state); break;
+    case Button::Right: right->setDisabled(state); break;
+    case Button::Start: start->setDisabled(state); break;
+    case Button::Select: select->setDisabled(state); break;
+    case Button::A: a->setDisabled(state); break;
+    case Button::B: b->setDisabled(state); break;
     }
-    blockSignals(false);
 }
 
 
@@ -201,10 +211,10 @@ void ControllerDisplay::paintEvent(QPaintEvent *)
 ///
 
 
-ControllerPanel::ControllerPanel(const QString& title, QWidget *parent) : QWidget(parent)
+ControllerPanel::ControllerPanel(int id, ControllerInfo& info, QWidget *parent) : QWidget(parent)
 {
     auto main_layout = new QHBoxLayout(this);
-    auto main_box = new QGroupBox(title, this);
+    auto main_box = new QGroupBox(QString("Controller ") + QString::number(id), this);
     auto main_box_layout = new QHBoxLayout(main_box);
     auto settings = new QWidget(main_box);
 
@@ -246,7 +256,7 @@ ControllerPanel::ControllerPanel(const QString& title, QWidget *parent) : QWidge
         int i = static_cast<int>(b);
         auto label = new QLabel(ButtonToString(b), button_box);
         button_box_layout->addWidget(label, i, 0, 1, 1);
-        mButtons[i] = new QPushButton(button_box);
+        mButtons[i] = new QPushButton(info[b].Name(), button_box);
         mButtons[i]->setAutoDefault(false);
         mButtons[i]->setCheckable(true);
         mButtons[i]->setFocusPolicy(Qt::NoFocus);
@@ -268,11 +278,24 @@ ControllerPanel::ControllerPanel(const QString& title, QWidget *parent) : QWidge
     connect(type_combo, &QComboBox::currentTextChanged, this, &ControllerPanel::TypeChanged);
     connect(preset_save, &QPushButton::clicked, [this](){emit SavePreset(mPreset->currentIndex());});
     connect(preset_load, &QPushButton::clicked, [this](){emit LoadPreset(mPreset->currentIndex());});
+    connect(mDisplay, &ControllerDisplay::ButtonPressed, this, &ControllerPanel::DisplayPressed);
 }
 
-void ControllerPanel::SetButtonState(Button button, bool active)
+void ControllerPanel::ResetDisplayButtons()
+{
+    mDisplay->ResetButtonState();
+}
+
+void ControllerPanel::SetDisplayButton(Button button, bool active)
 {
     mDisplay->SetButtonState(button, active);
+}
+
+void ControllerPanel::DisplayPressed(Button button, QPushButton *pushbutton)
+{
+    mDisplay->ResetButtonState();
+    pushbutton->setDisabled(true);
+    mButtons[static_cast<int>(button)]->setChecked(true);
 }
 
 
@@ -285,16 +308,19 @@ void ControllerPanel::SetButtonState(Button button, bool active)
 ///
 
 
-ControllerWindow::ControllerWindow(InputDevices* devices, QWidget *parent) : QDialog(parent), mDevices(devices)
+ControllerWindow::ControllerWindow(InputDevices* devices, ControllerInfo* controllers, QWidget *parent) : QDialog(parent), mDevices(devices)
 {
     setWindowTitle("Controller Settings");
     resize(1000, 875);
 
+    mInfo[0] = controllers[0];
+    mInfo[1] = controllers[1];
+
     auto main_layout = new QVBoxLayout(this);
-    auto controller0 = new ControllerPanel("Controller 1", this);
-    main_layout->addWidget(controller0);
-    auto controller1 = new ControllerPanel("Controller 2", this);
-    main_layout->addWidget(controller1);
+    mPanel[0] = new ControllerPanel(1, mInfo[0], this);
+    main_layout->addWidget(mPanel[0]);
+    mPanel[1] = new ControllerPanel(2, mInfo[1], this);
+    main_layout->addWidget(mPanel[1]);
     auto dialog_layout = new QHBoxLayout();
     auto spacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
     dialog_layout->addItem(spacer);
@@ -314,10 +340,10 @@ ControllerWindow::ControllerWindow(InputDevices* devices, QWidget *parent) : QDi
     connect(accept, &QPushButton::clicked, this, &QDialog::accept);
     connect(cancel, &QPushButton::clicked, this, &QDialog::reject);
 
-    connect(controller0, &ControllerPanel::AssignButton, [this](auto a, auto b) {AssignButton(0, a, b);});
-    connect(controller1, &ControllerPanel::AssignButton, [this](auto a, auto b) {AssignButton(1, a, b);});
+    connect(mPanel[0], &ControllerPanel::AssignButton, [this](auto a, auto b) {AssignButton(0, a, b);});
+    connect(mPanel[1], &ControllerPanel::AssignButton, [this](auto a, auto b) {AssignButton(1, a, b);});
 
-    connect(controller0, &ControllerPanel::TypeChanged, [this](auto t) {
+    connect(mPanel[0], &ControllerPanel::TypeChanged, [this](auto t) {
         auto s = ControllerType::None;
         if (t == "Standard")
             s = ControllerType::Standard;
@@ -325,7 +351,7 @@ ControllerWindow::ControllerWindow(InputDevices* devices, QWidget *parent) : QDi
             s = ControllerType::Zapper;
         mInfo[0].type = s;
     });
-    connect(controller1, &ControllerPanel::TypeChanged, [this](auto t) {
+    connect(mPanel[1], &ControllerPanel::TypeChanged, [this](auto t) {
         auto s = ControllerType::None;
         if (t == "Standard")
             s = ControllerType::Standard;
@@ -333,11 +359,22 @@ ControllerWindow::ControllerWindow(InputDevices* devices, QWidget *parent) : QDi
             s = ControllerType::Zapper;
         mInfo[0].type = s;
     });
+
+    poll_id = startTimer(50, Qt::TimerType::PreciseTimer);
+}
+
+ControllerInfo *ControllerWindow::Controllers()
+{
+    return mInfo;
 }
 
 
 void ControllerWindow::AssignButton(int controller, Button button, QPushButton *pbutton)
 {
+    if (poll_id != -1) {
+        killTimer(poll_id);
+    }
+
     if (mSelected) {
         mSelected->setChecked(false);
     }
@@ -360,6 +397,8 @@ void ControllerWindow::AssignButton(int controller, Button button, QPushButton *
         pbutton->setChecked(false);
         pbutton->setText(im.Name());
         qApp->postEvent(pbutton, new QFocusEvent(QEvent::Leave));
+        mPanel[controller]->ResetDisplayButtons();
+        poll_id = startTimer(50, Qt::TimerType::PreciseTimer);
         disconnect(*c0);
         disconnect(*c1);
         delete c0;
@@ -373,6 +412,8 @@ void ControllerWindow::AssignButton(int controller, Button button, QPushButton *
         pbutton->setChecked(false);
         pbutton->setText(mInfo[controller][button].Name());
         qApp->postEvent(pbutton, new QFocusEvent(QEvent::Leave));
+        mPanel[controller]->ResetDisplayButtons();
+        poll_id = startTimer(50, Qt::TimerType::PreciseTimer);
         disconnect(*c0);
         disconnect(*c1);
         delete c0;
@@ -394,3 +435,17 @@ void ControllerWindow::LoadPreset(int controller, int preset)
     Q_UNUSED(controller)
     Q_UNUSED(preset)
 }
+
+void ControllerWindow::timerEvent(QTimerEvent *event)
+{
+    Q_UNUSED(event)
+
+    for (int i = 0; i < 8; i++)
+    {
+        Button b = static_cast<Button>(i);
+        mPanel[0]->SetDisplayButton(b, mInfo[0][b].IsActive());
+        mPanel[1]->SetDisplayButton(b, mInfo[1][b].IsActive());
+    }
+}
+
+

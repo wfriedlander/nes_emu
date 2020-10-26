@@ -59,20 +59,13 @@ void InputDevices::ReceiveInput(InputMap im)
 
 
 
-
-
-
-
-
-
-
 Input::Input(QObject *parent) : QObject(parent)
 {
 
 }
 
 
-ControllerState Input::GetController(int controller)
+ControllerState Input::GetState(int controller)
 {
     ControllerState& state = mState[controller];
     ControllerInfo& info = mControllers[controller];
@@ -84,9 +77,9 @@ ControllerState Input::GetController(int controller)
 }
 
 
-void Input::SetController(int controller, ControllerInfo info)
+ControllerInfo* Input::Controllers()
 {
-    mControllers[controller] = info;
+    return mControllers;
 }
 
 
