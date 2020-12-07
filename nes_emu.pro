@@ -25,6 +25,7 @@ SOURCES += \
     core/mappers.cpp \
     core/nes.cpp \
     core/ppu.cpp \
+    core/romloader.cpp \
     core/serializer.cpp \
     gui/configure_audio.cpp \
     gui/configure_controller.cpp \
@@ -49,6 +50,7 @@ HEADERS += \
     core/cpu.h \
     core/mappers.h \
     core/ppu.h \
+    core/romloader.h \
     core/serializer.h \
     gui/configure_audio.h \
     gui/configure_controller.h \

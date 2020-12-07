@@ -4,6 +4,9 @@
 #include "serializer.h"
 
 
+
+
+
 struct CartridgeConfig
 {
 	byte prg_size;
@@ -33,6 +36,11 @@ public:
 template <int N>
 struct CartSegment
 {
+    CartSegment() {};
+    CartSegment(std::istream st)
+    {
+        st.read(this, N);
+    }
     operator char* ()
     {
         return reinterpret_cast<char*>(&mem[0]);

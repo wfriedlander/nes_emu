@@ -55,8 +55,10 @@ void Mapper::PpuWrite(word address, byte value)
 		NameWrite((address >> 10) & 0x3, address & 0x03FF, value);
 		break;
 	case 3: 
-		if (address & 0x0100) PaletteWrite(address & 0x1F, value);
-		break;
+        if (address & 0x0100) {
+            PaletteWrite(address & 0x1F, value);
+            break;
+        }
 	default:
 		PpuWrite(address - 0x1000, value);
 		break;

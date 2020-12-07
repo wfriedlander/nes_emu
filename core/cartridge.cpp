@@ -14,8 +14,7 @@ std::unique_ptr<Cartridge> Cartridge::Load(std::string filename)
 	st.read(reinterpret_cast<char*>(header), 16);
 
 	dword constant = Dword(Word(header[0], header[1]), Word(header[2], header[3]));
-	if (constant != 0x4E45531A)
-	{
+    if (constant != 0x4E45531A) {
 		return nullptr;
 	}
 
