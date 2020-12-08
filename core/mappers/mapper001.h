@@ -17,6 +17,6 @@ private:
 
 private:
     byte mReg[4] = {0x0C, 0x00, 0x00, 0x00};
-    word mShift = 0x100;
+    word mShift = 0x20;
 };
 

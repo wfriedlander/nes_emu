@@ -29,7 +29,6 @@ Mapper::Mapper(Cartridge& cart) : ram(2048), palette(32), unmapped(8192)
 byte Mapper::CpuRead(word address)
 {
     byte bank = address >> 13;
-//    std::cout << address << " " << bank << "\n";
     return prg_map[bank-2][address & 0x1FFF];
 }
 
@@ -61,7 +60,7 @@ void Mapper::PpuWrite(word address, byte value)
 // 6 banks of 8K slices from CPU 0x4000 to 0xFFFF
 bool Mapper::MapPrg(int bank, int slices, byte* mem)
 {
-    std::cout << "prg map " << bank << " " << slices << "\n";
+//    std::cout << "prg map " << bank << " " << slices << "\n";
     if (bank + slices > 6) {
         return false;
     }
@@ -74,7 +73,7 @@ bool Mapper::MapPrg(int bank, int slices, byte* mem)
 // 8 banks of 1K slices from PPU 0x0000 to 0x1FFF
 bool Mapper::MapChr(int bank, int slices, byte* mem)
 {
-    std::cout << "chr map " << bank << " " << slices << "\n";
+//    std::cout << "chr map " << bank << " " << slices << "\n";
     if (bank + slices > 8) {
         return false;
     }
@@ -87,7 +86,7 @@ bool Mapper::MapChr(int bank, int slices, byte* mem)
 // 4 banks of 1k slices from PPU 0x2000 to 0x2FFF
 bool Mapper::MapName(int bank, int slices, byte* mem)
 {
-    std::cout << "name map " << bank << " " << slices << "\n";
+//    std::cout << "name map " << bank << " " << slices << "\n";
     if (bank + slices > 4) {
         return false;
     }
@@ -100,25 +99,25 @@ bool Mapper::MapName(int bank, int slices, byte* mem)
 byte* Mapper::PrgBank(int bank)
 {
     int banks = (prg.size() >> 14);
-    std::cout << "prg bank " << bank << " adjusted " << ((banks + bank % banks) & (banks - 1)) << "\n";
+//    std::cout << "prg bank " << bank << " adjusted " << ((banks + bank % banks) & (banks - 1)) << "\n";
     return &prg[((banks + bank % banks) & (banks - 1)) * 0x4000];
 }
 
 byte* Mapper::ChrBank(int bank)
 {
     int banks = (chr.size() >> 13);
-    std::cout << "chr bank " << bank << " adjusted " << ((banks + bank % banks) & (banks - 1)) << "\n";
+//    std::cout << "chr bank " << bank << " adjusted " << ((banks + bank % banks) & (banks - 1)) << "\n";
     return &chr[((banks + bank % banks) & (banks - 1)) * 0x2000];
 }
 
 byte* Mapper::PrgHalfBank(int bank)
 {
-    std::cout << "prg half bank " << bank << "\n";
+//    std::cout << "prg half bank " << bank << "\n";
     return &PrgBank(bank >> 1)[(bank & 1) * 0x2000];
 }
 
 byte* Mapper::ChrHalfBank(int bank)
 {
-    std::cout << "chr half bank " << bank << "\n";
+//    std::cout << "chr half bank " << bank << "\n";
     return &ChrBank(bank >> 1)[(bank & 1) * 0x1000];
 }

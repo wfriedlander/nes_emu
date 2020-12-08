@@ -20,24 +20,23 @@ void Mapper001::CpuWrite(word address, byte value)
 {
     if (address & 0x8000)
     {
-        mShift = (mShift << 1) | (value & 0x81);
+        mShift = (value << 8) | ((mShift >> 1) & 0xFF);
 
-        if (mShift & 0x80) {
-            mShift = 0x200C | mReg[0];
+        if (mShift & 0x8000) {
+            mShift = ((mReg[0] | 0x0C) << 3) | 1;
             address = 0x8000;
         }
 
-        if (mShift & 0x2000) {
-            mReg[(address >> 13) & 0x03] = mShift & 0xFF;
-            std::cout << "reg write " << (int)address << ((address >> 13) & 0x03) << " " << (int)(mShift & 0xFF) << "\n";
-            mShift = 0x100;
+        if (mShift & 1) {
+            mReg[(address >> 13) & 0x03] = (mShift >> 4) & 0xFF;
+            mShift = 0x20;
             RegistersChanged();
         }
     }
     else if (address & 0x6000)
     {
         if (!(mReg[3] & 0x80)) {
-            ram[address & 0x1FFF] = value;
+            sram[address & 0x1FFF] = value;
         }
     }
 }
