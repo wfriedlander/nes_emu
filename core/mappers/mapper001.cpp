@@ -1,14 +1,13 @@
 
 #include "mapper001.h"
 
+#include <iostream>
 
 Mapper001::Mapper001(Cartridge& cart) : Mapper(cart)
 {
     // LOAD SAVE DATA HERE
 
     MapPrg(1, 2, &sram[0]);
-
-    mReg[0] = 0x0C;
     RegistersChanged();
 }
 
@@ -29,7 +28,8 @@ void Mapper001::CpuWrite(word address, byte value)
         }
 
         if (mShift & 0x2000) {
-            mReg[(address >> 13) & 0x03] = mShift;
+            mReg[(address >> 13) & 0x03] = mShift & 0xFF;
+            std::cout << "reg write " << (int)address << ((address >> 13) & 0x03) << " " << (int)(mShift & 0xFF) << "\n";
             mShift = 0x100;
             RegistersChanged();
         }
@@ -46,24 +46,26 @@ void Mapper001::RegistersChanged()
 {
     switch (mReg[0] & 3)
     {
-    case 0: MapName(0, 1, &ram[0]); MapName(1, 1, &ram[0]); MapName(1, 1, &ram[0]); MapName(1, 1, &ram[0]); break;
-    case 1: MapName(0, 1, &ram[1024]); MapName(1, 1, &ram[1024]); MapName(1, 1, &ram[1024]); MapName(1, 1, &ram[1024]); break;
-    case 2: MapName(0, 2, &ram[0]); MapName(0, 2, &ram[1024]); break;
-    case 3: MapName(0, 1, &ram[0]); MapName(1, 1, &ram[0]); MapName(1, 1, &ram[1024]); MapName(1, 1, &ram[1024]); break;
+    case 0: MapName(0, 1, &ram[0]); MapName(1, 1, &ram[0]); MapName(2, 1, &ram[0]); MapName(3, 1, &ram[0]); break;
+    case 1: MapName(0, 1, &ram[1024]); MapName(1, 1, &ram[1024]); MapName(2, 1, &ram[1024]); MapName(3, 1, &ram[1024]); break;
+    case 2: MapName(0, 2, &ram[0]); MapName(2, 2, &ram[0]); break;
+    case 3: MapName(0, 1, &ram[0]); MapName(1, 1, &ram[0]); MapName(2, 1, &ram[1024]); MapName(3, 1, &ram[1024]); break;
     }
 
     switch ((mReg[0] >> 2) & 3)
     {
     case 0:
-    case 1: MapPrg(2, 4, &prg[((mReg[3] >> 1) & 7) * 0x4000]); break;
-    case 2: MapPrg(2, 2, &prg[0]); MapPrg(4, 2, &prg[(mReg[3] & 0xF) * 0x4000]); break;
-    case 3: MapPrg(2, 2, &prg[(mReg[3] & 0xF) * 0x4000]); MapPrg(4, 2, &prg[prg.size() - 0x4000]); break;
+    case 1: MapPrg(2, 4, PrgBank(((mReg[3] >> 1) & 7))); break;
+    case 2: MapPrg(2, 2, PrgBank(0)); MapPrg(4, 2, PrgBank((mReg[3] & 0xF))); break;
+    case 3: MapPrg(2, 2, PrgBank((mReg[3] & 0xF))); MapPrg(4, 2, PrgBank(-1)); break;
     }
 
     switch (mReg[0] >> 4)
     {
-    case 0: MapChr(0, 8, &chr[(mReg[1] >> 1) * 0x1000]); break;
-    case 1: MapChr(0, 4, &chr[mReg[1] * 0x1000]); MapChr(4, 4, &chr[mReg[2] * 0x1000]); break;
+    case 0: MapChr(0, 8, ChrBank(mReg[1] >> 1)); break;
+    case 1: MapChr(0, 4, ChrHalfBank(mReg[1])); MapChr(4, 4, ChrHalfBank(mReg[2])); break;
     }
+
+
 }
 

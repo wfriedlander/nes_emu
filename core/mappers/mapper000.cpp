@@ -6,7 +6,7 @@ Mapper000::Mapper000(Cartridge& cart) : Mapper(cart)
 {
     MapPrg(2, 2, &prg[0]);
     if (cart.prg_size > 16) {
-        MapPrg(4, 2, &prg[0x2000]);
+        MapPrg(4, 2, &prg[0x4000]);
     }
     else {
         MapPrg(4, 2, &prg[0]);

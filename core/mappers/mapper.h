@@ -42,6 +42,11 @@ protected:
     bool MapChr(int bank, int size, byte* mem);
     bool MapName(int bank, int size, byte* mem);
 
+    byte* PrgBank(int bank);
+    byte* ChrBank(int bank);
+    byte* PrgHalfBank(int bank);
+    byte* ChrHalfBank(int bank);
+
 protected:
     std::string mName;
     bool mBattery = false;
