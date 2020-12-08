@@ -5,46 +5,36 @@
 #include "json.h"
 
 
-class Bus;
-class CPU;
-class PPU;
-class APU;
-class Cartridge;
-class Controller;
-
-
 class NES
 {
 public:
     NES(IVideo* video, IAudio* audio, IInput* input);
 
 public:
-	bool LoadGame(std::string filename);
-	void ResetGame();
+    Result<std::string> Load(std::string filename);
+    void Reset();
+
     json Serialize();
     void Deserialize(json state);
 
-    bool Step();
-	void FrameDone();
+    void RunFrame();
+    void Step();
 
 public:
 	void DebugKey(int key);
 
 private:
-	std::unique_ptr<Bus> mBus;
-	std::unique_ptr<CPU> mCPU;
-	std::unique_ptr<PPU> mPPU;
-    std::unique_ptr<APU> mAPU;
-	std::unique_ptr<Cartridge> mCartridge;
-	std::unique_ptr<Controller> mController;
+    std::unique_ptr<class Bus> mBus;
+    std::unique_ptr<class CPU> mCPU;
+    std::unique_ptr<class PPU> mPPU;
+    std::unique_ptr<class APU> mAPU;
+    std::unique_ptr<class Mapper> mMapper;
+    std::unique_ptr<class Controller> mController;
+
+    std::unique_ptr<class RomLoader> mLoader;
 
     IVideo* mVideo = nullptr;
     IAudio* mAudio = nullptr;
     IInput* mInput = nullptr;
-
-	std::chrono::time_point<std::chrono::high_resolution_clock> mLast;
-    int64_t mMicro = 16666;
-    bool mDone = false;
-
 };
 

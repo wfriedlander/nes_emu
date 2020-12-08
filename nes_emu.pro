@@ -19,14 +19,15 @@ SOURCES += \
     core/apu.cpp \
     core/blipbuffer.cpp \
     core/bus.cpp \
-    core/cartridge.cpp \
     core/controller.cpp \
     core/cpu.cpp \
-    core/mappers.cpp \
     core/nes.cpp \
     core/ppu.cpp \
     core/romloader.cpp \
     core/serializer.cpp \
+    core/mappers/mapper.cpp \
+    core/mappers/mapper000.cpp \
+    core/mappers/mapper001.cpp \
     gui/configure_audio.cpp \
     gui/configure_controller.cpp \
     gui/configure_general.cpp \
@@ -46,7 +47,6 @@ HEADERS += \
     core/apu.h \
     core/blipbuffer.h \
     core/bus.h \
-    core/cartridge.h \
     core/common.h \
     core/controller.h \
     core/cpu.h \
@@ -57,6 +57,9 @@ HEADERS += \
     core/ppu.h \
     core/romloader.h \
     core/serializer.h \
+    core/mappers/mapper.h \
+    core/mappers/mapper000.h \
+    core/mappers/mapper001.h \
     gui/configure_audio.h \
     gui/configure_controller.h \
     gui/configure_general.h \

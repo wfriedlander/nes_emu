@@ -28,7 +28,7 @@ GameLoader::GameLoader(NES *nes)
 
 bool GameLoader::LoadGame(const QString& filename)
 {
-    if (!mNes->LoadGame(filename.toStdString()))
+    if (!mNes->Load(filename.toStdString()))
         return false;
 
     if (mRecent.contains(filename))

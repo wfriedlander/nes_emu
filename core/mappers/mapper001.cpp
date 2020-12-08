@@ -8,7 +8,7 @@ Mapper001::Mapper001(Cartridge& cart) : Mapper(cart)
 
     MapPrg(1, 2, &sram[0]);
 
-    reg[0] = 0x0C;
+    mReg[0] = 0x0C;
     RegistersChanged();
 }
 
@@ -56,8 +56,8 @@ void Mapper001::RegistersChanged()
     {
     case 0:
     case 1: MapPrg(2, 4, &prg[((mReg[3] >> 1) & 7) * 0x4000]); break;
-    case 2: MapPrg(2, 2, &prg[0]); MapPrg(4, 2, &prg[(mReg[3] & 0xF) * 0x4000]]); break;
-    case 3: MapPrg(2, 2, &prg[(mReg[3] & 0xF) * 0x4000]]); MapPrg(4, 2, &prg[prg.size() - 0x4000]); break;
+    case 2: MapPrg(2, 2, &prg[0]); MapPrg(4, 2, &prg[(mReg[3] & 0xF) * 0x4000]); break;
+    case 3: MapPrg(2, 2, &prg[(mReg[3] & 0xF) * 0x4000]); MapPrg(4, 2, &prg[prg.size() - 0x4000]); break;
     }
 
     switch (mReg[0] >> 4)

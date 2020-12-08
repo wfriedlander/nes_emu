@@ -5,7 +5,7 @@
 #include "cpu.h"
 #include "ppu.h"
 #include "apu.h"
-#include "cartridge.h"
+#include "mappers.h"
 #include "controller.h"
 #include "serializer.h"
 
@@ -20,7 +20,7 @@ public:
 
 public:
     void Initialize(NES* nes, CPU* cpu, PPU* ppu, APU* apu, Controller* control);
-	void LoadGame(Cartridge* cart);
+    void Load(Mapper* mapper);
 	void Reset();
 
 public:
@@ -39,7 +39,7 @@ private:
 	CPU* mCPU = nullptr;
 	PPU* mPPU = nullptr;
     APU* mAPU = nullptr;
-	Cartridge* mCartridge = nullptr;
+    Mapper* mMapper = nullptr;
 	Controller* mController = nullptr;
 
 private:

@@ -1,7 +1,10 @@
 #pragma once
 
 #include "common.h"
+#include "mappers/mapper.h"
+
 #include <map>
+
 
 
 
@@ -50,22 +53,6 @@ struct DBRecord
     std::string ppu;
 };
 
-struct Cartridge2
-{
-    std::string name;
-    std::vector<byte> trainer;
-    std::vector<byte> prg;
-    std::vector<byte> chr;
-
-    int mapper = 0;
-    int mirroring = 0;
-    int prg_size = 0;
-    int chr_size = 0;
-    int vram_size = 0;
-    int wram_size = 0;
-    int sram_size = 0;
-    bool battery = false;
-};
 
 class RomLoader
 {
@@ -73,7 +60,7 @@ public:
     RomLoader();
 
 public:
-    void Load(std::string filename);
+    Result<Mapper*> Load(std::string filename);
 
 private:
     std::map<uint32_t, DBRecord> mRoms;

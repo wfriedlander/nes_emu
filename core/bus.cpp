@@ -15,9 +15,9 @@ void Bus::Initialize(NES* nes, CPU* cpu, PPU* ppu, APU* apu, Controller* control
 	mController = control;
 }
 
-void Bus::LoadGame(Cartridge* cart)
+void Bus::Load(Mapper* mapper)
 {
-	mCartridge = cart;
+    mMapper = mapper;
 }
 
 void Bus::Reset()
@@ -29,7 +29,6 @@ void Bus::Reset()
 
 void Bus::FrameComplete()
 {
-	mNES->FrameDone();
 	mAPU->FrameDone();
 }
 
@@ -94,7 +93,7 @@ byte Bus::CpuRead(word address)
 		}
 
 	default:
-		return mCartridge->CpuRead(address);
+        return mMapper->CpuRead(address);
 	}
 }
 
@@ -160,19 +159,19 @@ void Bus::CpuWrite(word address, byte value)
         break;
 
 	default:
-		mCartridge->CpuWrite(address, value);
+        mMapper->CpuWrite(address, value);
 		break;
 	}
 }
 
 byte Bus::PpuRead(word address)
 {
-	return mCartridge->PpuRead(address);
+    return mMapper->PpuRead(address);
 }
 
 void Bus::PpuWrite(word address, byte value)
 {
-	mCartridge->PpuWrite(address, value);
+    mMapper->PpuWrite(address, value);
 }
 
 

@@ -1,11 +1,12 @@
 #include "romloader.h"
+#include "mappers.h"
 
 #include <sstream>
 #include <filesystem>
 #include <array>
 
 #include <QFile>
-#include <QDebug>
+
 
 static uint32_t crc32_table[] = {
     0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419, 0x706af48f,
@@ -53,18 +54,6 @@ static uint32_t crc32_table[] = {
     0xb40bbe37, 0xc30c8ea1, 0x5a05df1b, 0x2d02ef8d
 };
 
-//uint32_t crc32(std::ifstream& st)
-//{
-//    std::streamsize position = st.tellg();
-//    int32_t byte = 0;
-//    uint32_t crc = 0xFFFFFFFF;
-//    while ((byte = st.get()) >= 0) {
-//        crc = (crc32_table[(crc ^ byte) & 0xff] ^ ((crc) >> 8));
-//    }
-//    st.clear();
-//    st.seekg(position);
-//    return ~crc;
-//}
 
 uint32_t crc32(iNesRom& ines)
 {
@@ -88,8 +77,6 @@ RomLoader::RomLoader()
     f.open(QIODevice::ReadOnly);
     std::istringstream file(f.readAll().toStdString());
     std::string line;
-
-    auto t0 = std::chrono::high_resolution_clock::now();
 
     while (std::getline(file, line)) {
         if (line.front() == '#') continue;
@@ -125,34 +112,30 @@ RomLoader::RomLoader()
         std::getline(stream, desc.vs, ',');
         std::getline(stream, desc.ppu, ',');
 
-        if (desc.chr > 0 && desc.vram > 0) {
-            qDebug() << Qt::hex << std::stoul(crc, 0, 16);
-        }
-
         mRoms[std::stoul(crc, 0, 16)] = desc;
     }
-
-    auto t1 = std::chrono::high_resolution_clock::now() - t0;
-
-    qDebug() << "Cart database loaded" << mRoms.size() << "roms in" << t1.count() / 1000000.0 << "ms";
 }
 
-bool LoadRom(std::string filename, iNesRom& ines)
+Result<iNesRom> LoadRom(std::string filename)
 {
     std::ifstream st(filename, std::ifstream::in | std::ifstream::binary);
+    if (!st) {
+        return "File doesn't exist";
+    }
+
+    iNesRom ines;
+
     st.read(reinterpret_cast<char*>(&ines), 16);
 
     byte nes[4] = {'N', 'E', 'S', 0x1A};
     if (std::memcmp(ines.header, nes, 4) != 0) {
-        qDebug() << "invalid header";
-        return false;
+        return "Invalid iNES ROM header";
     }
 
     auto size = std::filesystem::file_size(filename) - 16;
     uint32_t expected_size = ines.prg_size * 0x4000 + ines.chr_size * 0x2000 + ines.trainer_size * 512;
     if (size != expected_size) {
-        qDebug() << "invalid size:" << size << expected_size;
-        return false;
+        return "Invalid iNES ROM data";
     }
 
     ines.mapper = (ines.mapper_high << 4) | ines.mapper_low;
@@ -164,32 +147,28 @@ bool LoadRom(std::string filename, iNesRom& ines)
     ines.chr.resize(ines.chr_size * 1024 * 8);
     st.read(reinterpret_cast<char*>(ines.chr.data()), ines.chr_size * 1024 * 8);
 
-    return true;
+    return ines;
 }
 
-void RomLoader::Load(std::string filename)
+Result<Mapper*> RomLoader::Load(std::string filename)
 {
-    qDebug() << filename.c_str();
-
-    iNesRom ines;
-    if (!LoadRom(filename, ines)) {
-        qDebug() << "invalid ines rom";
-        return;
+    auto ines = LoadRom(filename);
+    if (!ines) {
+        return ines.error;
     }
 
-    Cartridge2 cart {
+    Cartridge cart {
         std::filesystem::path(filename).filename().replace_extension("").string(),
-        ines.trainer,
-        ines.prg,
-        ines.chr,
-        ines.mapper,
-        ines.four_screen ? 2 : ines.mirroring,
-        ines.prg_size * 16,
-        ines.chr_size * 8,
+        ines->trainer,
+        ines->prg,
+        ines->chr,
+        ines->four_screen ? 2 : ines->mirroring,
+        ines->prg_size * 16,
+        ines->chr_size * 8,
         0,
         0,
-        ines.battery * 8,
-        ines.battery > 0
+        ines->battery * 8,
+        ines->battery > 0
     };
 
     uint32_t crc = crc32(ines);
@@ -201,8 +180,11 @@ void RomLoader::Load(std::string filename)
         cart.wram_size = rec.wram;
         cart.sram_size = rec.sram;
     }
-    else {
-        qDebug() << "not in database";
+
+    switch (ines->mapper) {
+    case 0: return new Mapper000(cart);
+    case 1: return new Mapper001(cart);
+    default: return "Mapper not implemented";
     }
 }
 

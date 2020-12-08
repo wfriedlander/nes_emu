@@ -625,6 +625,7 @@ void APU::Reset()
 
 byte APU::RegisterRead(word address)
 {
+    (void)address;
     return 0;
 }
 

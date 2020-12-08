@@ -72,7 +72,7 @@ void MainWindow::Pause()
 
 void MainWindow::Reset()
 {
-    mNes->ResetGame();
+    mNes->Reset();
 }
 
 void MainWindow::SaveState(int state)
@@ -163,7 +163,8 @@ void MainWindow::RunFrame()
 //    qDebug() << p << mFrameTimeAverage << ms;
     if (mPlaying) {
         QTimer::singleShot(ms, Qt::TimerType::PreciseTimer, this, &MainWindow::RunFrame);
-        while(!mNes->Step());
+//        while(!mNes->Step());
+        mNes->RunFrame();
     }
 }
 
