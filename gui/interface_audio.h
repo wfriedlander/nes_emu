@@ -1,9 +1,9 @@
 #ifndef AUDIO_H
 #define AUDIO_H
 
-#include "interface.h"
+#include "core/interface.h"
+#include "core/blipbuffer.h"
 #include "portaudio/portaudio.h"
-#include "blipbuffer.h"
 
 #include <chrono>
 

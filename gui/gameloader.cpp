@@ -1,5 +1,5 @@
 #include "gameloader.h"
-#include "json.h"
+#include "core/json.h"
 
 #include <fstream>
 #include <string>

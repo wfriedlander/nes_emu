@@ -44,11 +44,16 @@ SOURCES += \
 
 HEADERS += \
     core/apu.h \
+    core/blipbuffer.h \
     core/bus.h \
     core/cartridge.h \
+    core/common.h \
     core/controller.h \
     core/cpu.h \
+    core/interface.h \
+    core/json.h \
     core/mappers.h \
+    core/nes.h \
     core/ppu.h \
     core/romloader.h \
     core/serializer.h \
@@ -65,12 +70,7 @@ HEADERS += \
     gui/keyboard.h \
     gui/mainwindow.h \
     gui/settings.h \
-    gui/storage.h \
-    include/blipbuffer.h \
-    include/common.h \
-    include/interface.h \
-    include/json.h \
-    include/nes.h
+    gui/storage.h
 
 FORMS += \
     gui/controllerinput.ui \

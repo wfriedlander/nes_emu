@@ -1,7 +1,7 @@
 #ifndef INPUT_H
 #define INPUT_H
 
-#include "interface.h"
+#include "core/interface.h"
 
 #include <chrono>
 #include <vector>

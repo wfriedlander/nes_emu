@@ -3,7 +3,7 @@
 
 #include <QStringList>
 
-#include "nes.h"
+#include "core/nes.h"
 
 
 class GameLoader

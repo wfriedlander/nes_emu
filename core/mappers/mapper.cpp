@@ -1,64 +1,5 @@
-#pragma once
 
-#include "common.h"
-
-
-struct Cartridge
-{
-    std::string name;
-    std::vector<byte> trainer;
-    std::vector<byte> prg;
-    std::vector<byte> chr;
-
-    int mirroring = 0;
-    int prg_size = 0;
-    int chr_size = 0;
-    int vram_size = 0;
-    int wram_size = 0;
-    int sram_size = 0;
-    bool battery = false;
-};
-
-
-
-class Mapper
-{
-public:
-    Mapper(Cartridge& cart);
-    virtual ~Mapper() = 0;
-
-public:
-    byte CpuRead(word address);
-    virtual void CpuWrite(word address, byte value) {};
-    byte PpuRead(word address);
-    void PpuWrite(word address, byte value);
-
-public:
-    virtual void EndScanline() {};
-
-protected:
-    bool MapPrg(int bank, int size, byte* mem);
-    bool MapChr(int bank, int size, byte* mem);
-    bool MapName(int bank, int size, byte* mem);
-
-protected:
-    std::string mName;
-    bool mBattery = false;
-    bool mChrRam = false;
-    int mMirroring = 0;
-    
-    byte* prg_map[6];
-    byte* chr_map[8];
-    byte* name_map[4];
-
-    std::vector<byte> trainer;
-    std::vector<byte> prg;
-    std::vector<byte> chr;
-    std::vector<byte> wram;
-    std::vector<byte> sram;
-    std::vector<byte> palette;
-    std::vector<byte> ram;
-};
+#include "mapper.h"
 
 
 Mapper::Mapper(Cartridge& cart) : ram(2048), palette(32);
@@ -145,5 +86,4 @@ bool Mapper::MapName(int bank, int slices, byte* mem)
     }
     return true;
 }
-
 

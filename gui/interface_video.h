@@ -4,7 +4,7 @@
 #include <QOpenGLExtraFunctions>
 #include <array>
 
-#include "interface.h"
+#include "core/interface.h"
 
 
 

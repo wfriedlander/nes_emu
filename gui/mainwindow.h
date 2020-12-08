@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 
-#include "nes.h"
+#include "core/nes.h"
 
 class InputDevices;
 class GameLoader;
