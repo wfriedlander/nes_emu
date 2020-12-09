@@ -101,6 +101,7 @@ void NES::RunFrame()
 
 void NES::DebugKey(int key)
 {
+    (void)key;
 	//std::cout << key << "\n";
 //	if (key == 22)
 //		mCPU->EnableLogging(true);
