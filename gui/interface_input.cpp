@@ -19,6 +19,7 @@ QString ButtonToString(Button button)
     case Button::Select: return "Select";
     case Button::A: return "A";
     case Button::B: return "B";
+    default: return "Unknown";
     }
 }
 

@@ -35,7 +35,7 @@ void Mapper001::CpuWrite(word address, byte value)
     else if (address & 0x6000)
     {
         if (!(mReg[3] & 0x80)) {
-            sram[address & 0x1FFF] = value;
+            prg_map[SAVE_RAM][address & 0x1FFF] = value;
         }
     }
 }
@@ -54,7 +54,7 @@ void Mapper001::RegistersChanged()
     {
     case 0:
     case 1:
-        MapRegion(PRG_0, 32, prg, (mReg[3] >> 1) & 0x7, 16);
+        MapRegion(PRG_0, 32, prg, (mReg[3] >> 1) & 0x7, 32);
         break;
     case 2:
         MapRegion(PRG_0, 16, prg);

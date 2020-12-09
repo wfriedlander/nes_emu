@@ -47,10 +47,10 @@ Audio::Audio()
     params.hostApiSpecificStreamInfo = NULL;
 
     auto fs = Pa_IsFormatSupported(NULL, &params, 48000.0);
-//    qDebug() << Pa_GetErrorText(fs);
+    qDebug() << Pa_GetErrorText(fs);
 
     auto err = Pa_OpenStream(&mStream, NULL, &params, 48000, 200, paNoFlag, paCallback, this);
-//    qDebug() << Pa_GetErrorText(err);
+    qDebug() << Pa_GetErrorText(err);
 }
 
 Audio::~Audio()

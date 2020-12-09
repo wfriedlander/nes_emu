@@ -315,7 +315,6 @@ QString Keyboard::KeyToString(Key key)
 {
     switch (key)
     {
-    case Key::Unknown:      return "Unknown";
     case Key::A:            return "A";
     case Key::B:            return "B";
     case Key::C:            return "C";
@@ -418,5 +417,6 @@ QString Keyboard::KeyToString(Key key)
     case Key::ScrollLock:   return "Scroll Lock";
     case Key::NumLock:      return "Num Lock";
     case Key::CapsLock:     return "Caps Lock";
+    default:                return "Unknown";
     }
 }

@@ -186,6 +186,9 @@ void Mapper::MapRegion(REGION region, int kb_size, std::vector<byte>& mem, int b
     int slice_size = 0;
     int bank_size = 0;
 
+    if (mem.size() == 0)
+        return;
+
     if (region <= PRG_1) {
         table = prg_map;
         slice_size = 8;
