@@ -3,6 +3,7 @@
 #include "core/common.h"
 #include "core/serializer.h"
 
+#include <iostream>
 
 struct Cartridge
 {
@@ -26,7 +27,7 @@ class Mapper : public Serializable
 {
 public:
     Mapper(Cartridge& cart);
-    virtual ~Mapper() {};
+    virtual ~Mapper() {}
 
 public:
     byte CpuRead(word address);

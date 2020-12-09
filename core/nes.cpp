@@ -16,19 +16,30 @@
 
 NES::NES(IVideo* video, IAudio* audio, IInput* input) : mVideo(video), mAudio(audio), mInput(input)
 {
-	mBus = std::make_unique<Bus>();
-	mCPU = std::make_unique<CPU>(mBus.get());
-	mPPU = std::make_unique<PPU>(mBus.get());
-    mAPU = std::make_unique<APU>(mBus.get());
-	mController = std::make_unique<Controller>();
+    mBus = new Bus;
+    mCPU = new CPU(mBus);
+    mPPU = new PPU(mBus);
+    mAPU = new APU(mBus);
+    mController = new Controller;
 
-    mLoader = std::make_unique<RomLoader>();
+    mLoader = new RomLoader;
 
 	mPPU->SetVideoBackend(mVideo);
 	mAPU->SetAudioBackend(mAudio);
 	mController->SetInputBackend(mInput);
 
-	mBus->Initialize(this, mCPU.get(), mPPU.get(), mAPU.get(), mController.get());
+    mBus->Initialize(this, mCPU, mPPU, mAPU, mController);
+}
+
+NES::~NES()
+{
+    delete mBus;
+    delete mCPU;
+    delete mPPU;
+    delete mAPU;
+    delete mController;
+    delete mLoader;
+    if (mMapper) delete mMapper;
 }
 
 Result<std::string> NES::Load(std::string filename)
@@ -38,9 +49,13 @@ Result<std::string> NES::Load(std::string filename)
         return {result.error, false};
     }
 
+    if (mMapper) {
+        delete mMapper;
+    }
+
     mMapper = result;
 
-    mBus->Load(mMapper.get());
+    mBus->Load(mMapper);
 	mBus->Reset();
     return filename + " loaded";
 }

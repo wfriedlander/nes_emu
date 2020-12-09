@@ -1,18 +1,30 @@
 
 #include "mapper001.h"
 
+#include <fstream>
 #include <iostream>
+
 
 Mapper001::Mapper001(Cartridge& cart) : Mapper(cart)
 {
-    // LOAD SAVE DATA HERE
+    if (sram.size() > 0) {
+        std::ifstream st("Saves/" + mName + ".sav", std::ofstream::binary);
+        for (auto&& b : sram) {
+            st >> b;
+        }
+    }
     MapRegion(SAVE_RAM, 8, sram);
     RegistersChanged();
 }
 
 Mapper001::~Mapper001()
 {
-    // STORE SAVE DATA HERE
+    if (sram.size() > 0) {
+        std::ofstream st("Saves/" + mName + ".sav", std::ofstream::binary);
+        for (auto& b : sram) {
+            st << b;
+        }
+    }
 }
 
 void Mapper001::CpuWrite(word address, byte value)

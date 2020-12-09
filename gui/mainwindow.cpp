@@ -33,6 +33,20 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     UpdateRecents();
 
+
+    InputConfig c0;
+    c0.type = ControllerType::Standard;
+    c0[Button::Up] = {0, 0, 74};
+    c0[Button::Down] = {0, 0, 75};
+    c0[Button::Left] = {0, 0, 72};
+    c0[Button::Right] = {0, 0, 73};
+    c0[Button::Start] = {0, 0, 58};
+    c0[Button::Select] = {0, 0, 42};
+    c0[Button::A] = {0, 0, 5};
+    c0[Button::B] = {0, 0, 3};
+
+    mInput->Controllers()[0] = mInputDevices->ControllerFromConfig(c0);
+
     setCentralWidget(mVideo);
     // THIS DOESN'T WORK MUST MOVE TO SHOW EVENT OR SOMETHING
     resize(512, 473 + menuBar()->height());
@@ -40,7 +54,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
 MainWindow::~MainWindow()
 {
-
+    delete mAudio;
+    delete mLoader;
+    delete mNes;
 }
 
 void MainWindow::Open()

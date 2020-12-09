@@ -36,6 +36,24 @@ InputDevices::InputDevices(QObject *parent) : QObject(parent)
     }
 }
 
+ControllerInfo InputDevices::ControllerFromConfig(InputConfig config)
+{
+    ControllerInfo info;
+    info.type = config.type;
+
+    for (int i = 0; i < 8; i++)
+    {
+        Button b = static_cast<Button>(i);
+        info[b] = {mDevices[config[b].device], config[b].code};
+    }
+    return info;
+}
+
+InputConfig InputDevices::ConfigFromInfo(ControllerInfo info)
+{
+    return InputConfig();
+}
+
 void InputDevices::GetImmediateInput()
 {
     mWaitingForInput = true;

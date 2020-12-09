@@ -9,6 +9,7 @@ class NES
 {
 public:
     NES(IVideo* video, IAudio* audio, IInput* input);
+    ~NES();
 
 public:
     Result<std::string> Load(std::string filename);
@@ -24,14 +25,14 @@ public:
 	void DebugKey(int key);
 
 private:
-    std::unique_ptr<class Bus> mBus;
-    std::unique_ptr<class CPU> mCPU;
-    std::unique_ptr<class PPU> mPPU;
-    std::unique_ptr<class APU> mAPU;
-    std::unique_ptr<class Mapper> mMapper;
-    std::unique_ptr<class Controller> mController;
+    class Bus* mBus = nullptr;
+    class CPU* mCPU = nullptr;
+    class PPU* mPPU = nullptr;
+    class APU* mAPU = nullptr;
+    class Mapper* mMapper = nullptr;
+    class Controller* mController = nullptr;
 
-    std::unique_ptr<class RomLoader> mLoader;
+    class RomLoader* mLoader = nullptr;
 
     IVideo* mVideo = nullptr;
     IAudio* mAudio = nullptr;

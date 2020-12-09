@@ -8,6 +8,7 @@ using ScreenBuffer = uint8_t[240][256];
 class IVideo
 {
 public:
+    virtual ~IVideo() {}
     virtual void VideoUpdate(const ScreenBuffer& buffer) = 0;
 };
 
@@ -17,6 +18,7 @@ class Blip_Buffer;
 class IAudio
 {
 public:
+    virtual ~IAudio() {}
     virtual void SetBuffer(Blip_Buffer* buffer) = 0;
 };
 
@@ -44,6 +46,7 @@ private:
 class IInput
 {
 public:
+    virtual ~IInput() {}
     virtual ControllerState GetState(int controller) = 0;
 };
 
