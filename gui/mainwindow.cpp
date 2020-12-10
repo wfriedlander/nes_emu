@@ -94,22 +94,13 @@ void MainWindow::Reset()
 void MainWindow::SaveState(int state)
 {
     qDebug() << "Save " << state;
-
-    json save_state = mNes->Serialize();
-
-    std::ofstream o("state" + std::to_string(state) + ".json");
-    o << save_state;
+    mNes->SaveState(state);
 }
 
 void MainWindow::LoadState(int state)
 {
     qDebug() << "Load " << state;
-
-    std::ifstream i("state" + std::to_string(state) + ".json");
-    if (!i.is_open()) return;
-    json load_state;
-    i >> load_state;
-    mNes->Deserialize(load_state);
+    mNes->LoadState(state);
 }
 
 void MainWindow::GeneralSettings()

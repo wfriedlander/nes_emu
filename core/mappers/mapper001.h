@@ -12,7 +12,7 @@ public:
     void CpuWrite(word address, byte value);
 
 private:
-    void RegistersChanged();
+    void ApplyMapping();
 
 private:
     byte mReg[4] = {0x0C, 0x00, 0x00, 0x00};

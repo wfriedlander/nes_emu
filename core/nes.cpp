@@ -65,24 +65,45 @@ void NES::Reset()
     mBus->Reset();
 }
 
-json NES::Serialize()
+void NES::Close()
 {
+    if (mMapper) {
+        delete mMapper;
+        mMapper = nullptr;
+    }
+}
+
+bool NES::SaveState(int slot)
+{
+    if (mMapper == nullptr) return false;
     json state;
     state["bus"] = mBus->Serialize();
     state["cpu"] = mCPU->Serialize();
     state["ppu"] = mPPU->Serialize();
     state["apu"] = mAPU->Serialize();
     state["map"] = mMapper->Serialize();
-    return state;
+
+    std::ofstream o("SaveStates/" + mMapper->RomName() + "_" + std::to_string(slot) + ".state");
+    o << state;
+
+    return true;
 }
 
-void NES::Deserialize(json state)
+bool NES::LoadState(int slot)
 {
+    if (mMapper == nullptr) return false;
+
+    std::ifstream i("SaveStates/" + mMapper->RomName() + "_" + std::to_string(slot) + ".state");
+    if (!i.is_open()) return false;
+    json state;
+    i >> state;
+
     mBus->Deserialize(state["bus"]);
     mCPU->Deserialize(state["cpu"]);
     mPPU->Deserialize(state["ppu"]);
     mAPU->Deserialize(state["apu"]);
     mMapper->Deserialize(state["map"]);
+    return true;
 }
 
 void NES::Step()
@@ -104,6 +125,8 @@ void NES::Step()
 
 void NES::RunFrame()
 {
+    if (mMapper == nullptr) return;
+
     do {
         nes_time time = mCPU->CurrentCycle();
         nes_time next = mPPU->MinTimeToNMI();

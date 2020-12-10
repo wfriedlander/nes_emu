@@ -14,9 +14,10 @@ public:
 public:
     Result<std::string> Load(std::string filename);
     void Reset();
+    void Close();
 
-    json Serialize();
-    void Deserialize(json state);
+    bool SaveState(int slot);
+    bool LoadState(int slot);
 
     void RunFrame();
     void Step();

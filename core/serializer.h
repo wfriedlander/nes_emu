@@ -1,5 +1,4 @@
-#ifndef SERIALIZER_H
-#define SERIALIZER_H
+#pragma once
 
 #include "json.h"
 #include "common.h"
@@ -25,8 +24,11 @@ class Serializable
     };
 
 public:
+    virtual ~Serializable() {}
+
+public:
     json Serialize();
-    void Deserialize(json state);
+    virtual void Deserialize(json& state);
 
 public:
     void RegisterField(std::string name, reg* value);
@@ -42,4 +44,3 @@ private:
     std::vector<Item> mItems;
 };
 
-#endif // SERIALIZER_H

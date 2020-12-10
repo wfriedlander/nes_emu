@@ -101,7 +101,7 @@ json Serializable::Serialize()
     return state;
 }
 
-void Serializable::Deserialize(json state)
+void Serializable::Deserialize(json& state)
 {
     for (auto& item : mItems)
     {

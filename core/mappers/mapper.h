@@ -30,6 +30,9 @@ public:
     virtual ~Mapper();
 
 public:
+    std::string RomName() {return mName;}
+
+public:
     byte CpuRead(word address);
     virtual void CpuWrite(word address, byte value) {(void)address; (void)value;};
     byte PpuRead(word address);
@@ -37,6 +40,9 @@ public:
 
 public:
     virtual void EndScanline() {};
+
+public:
+    void Deserialize(json& state);
 
 protected:
     enum MIRRORING {
@@ -69,23 +75,15 @@ protected:
 
 
 protected:
-//    bool MapPrg(int bank, int size, byte* mem);
-//    bool MapChr(int bank, int size, byte* mem);
-//    bool MapName(int bank, int size, byte* mem);
-
-//    byte* PrgBank(int bank);
-//    byte* ChrBank(int bank);
-//    byte* PrgHalfBank(int bank);
-//    byte* ChrHalfBank(int bank);
-
     void MapNametable(MIRRORING mirroring);
     void MapRegion(REGION region, int kb_size, std::vector<byte>& mem, int bank=0, int kb_bank_size=-1);
+    virtual void ApplyMapping() {};
 
 protected:
     std::string mName;
     bool mBattery = false;
     bool mChrRam = false;
-    int mMirroring = 0;
+    byte mMirroring = 0;
     
     byte* prg_map[6];
     byte* chr_map[8];

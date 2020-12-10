@@ -7,8 +7,11 @@
 
 Mapper001::Mapper001(Cartridge& cart) : Mapper(cart)
 {
+    RegisterField("reg", mReg, 4);
+    RegisterField("shift", &mShift);
+
     MapRegion(SAVE_RAM, 8, sram);
-    RegistersChanged();
+    ApplyMapping();
 }
 
 void Mapper001::CpuWrite(word address, byte value)
@@ -25,7 +28,7 @@ void Mapper001::CpuWrite(word address, byte value)
         if (mShift & 1) {
             mReg[(address >> 13) & 0x03] = (mShift >> 4) & 0xFF;
             mShift = 0x20;
-            RegistersChanged();
+            ApplyMapping();
         }
     }
     else if (address & 0x6000)
@@ -36,7 +39,7 @@ void Mapper001::CpuWrite(word address, byte value)
     }
 }
 
-void Mapper001::RegistersChanged()
+void Mapper001::ApplyMapping()
 {
     switch (mReg[0] & 3)
     {

@@ -27,6 +27,17 @@ Mapper::Mapper(Cartridge& cart) : ram(2048), palette(32), unmapped(1024)
         std::ifstream st("Saves/" + mName + ".sav", std::ofstream::binary);
         st.read((char*)&sram[0], sram.size());
     }
+
+    RegisterField("mirroring", &mMirroring);
+    if (cart.vram_size > 0) {
+        RegisterField("chr", &chr[0], chr.size());
+    }
+    if (sram.size() > 0) {
+        RegisterField("sram", &sram[0], sram.size());
+    }
+    RegisterField("ram", &ram[0], 2048);
+    RegisterField("palette", &palette[0], 32);
+
 }
 
 Mapper::~Mapper()
@@ -37,6 +48,12 @@ Mapper::~Mapper()
             st << b;
         }
     }
+}
+
+void Mapper::Deserialize(json& state)
+{
+    Serializable::Deserialize(state);
+    ApplyMapping();
 }
 
 byte Mapper::CpuRead(word address)
@@ -69,74 +86,6 @@ void Mapper::PpuWrite(word address, byte value)
     default: PpuWrite(address - 0x1000, value); break;
     }
 };
-
-//// 6 banks of 8K slices from CPU 0x4000 to 0xFFFF
-//bool Mapper::MapPrg(int bank, int slices, byte* mem)
-//{
-////    std::cout << "prg map " << bank << " " << slices << "\n";
-//    if (bank + slices > 6) {
-//        return false;
-//    }
-//    for (int i = 0; i < slices; i++) {
-//        prg_map[bank + i] = &mem[0x2000 * i];
-//        std::cout << "MapPrg " << bank + i << " " << 0x2000 * i << "\n";
-//    }
-//    return true;
-//}
-
-//// 8 banks of 1K slices from PPU 0x0000 to 0x1FFF
-//bool Mapper::MapChr(int bank, int slices, byte* mem)
-//{
-////    std::cout << "chr map " << bank << " " << slices << "\n";
-//    if (bank + slices > 8) {
-//        return false;
-//    }
-//    for (int i = 0; i < slices; i++) {
-//        chr_map[bank + i] = &mem[0x400 * i];
-//        std::cout << "MapChr " << bank + i << " " << 0x400 * i << "\n";
-//    }
-//    return true;
-//}
-
-//// 4 banks of 1k slices from PPU 0x2000 to 0x2FFF
-//bool Mapper::MapName(int bank, int slices, byte* mem)
-//{
-////    std::cout << "name map " << bank << " " << slices << "\n";
-//    if (bank + slices > 4) {
-//        return false;
-//    }
-//    for (int i = 0; i < slices; i++) {
-//        name_map[bank + i] = &mem[0x400 * i];
-//        std::cout << "MapName " << bank + i << " " << 0x400 * i << "\n";
-//    }
-//    return true;
-//}
-
-//byte* Mapper::PrgBank(int bank)
-//{
-//    int banks = (prg.size() >> 14);
-////    std::cout << "prg bank " << bank << " adjusted " << ((banks + bank % banks) & (banks - 1)) << "\n";
-//    return &prg[((banks + bank % banks) & (banks - 1)) * 0x4000];
-//}
-
-//byte* Mapper::ChrBank(int bank)
-//{
-//    int banks = (chr.size() >> 13);
-////    std::cout << "chr bank " << bank << " adjusted " << ((banks + bank % banks) & (banks - 1)) << "\n";
-//    return &chr[((banks + bank % banks) & (banks - 1)) * 0x2000];
-//}
-
-//byte* Mapper::PrgHalfBank(int bank)
-//{
-////    std::cout << "prg half bank " << bank << "\n";
-//    return &PrgBank(bank >> 1)[(bank & 1) * 0x2000];
-//}
-
-//byte* Mapper::ChrHalfBank(int bank)
-//{
-////    std::cout << "chr half bank " << bank << "\n";
-//    return &ChrBank(bank >> 1)[(bank & 1) * 0x1000];
-//}
 
 
 void Mapper::MapNametable(MIRRORING mirroring)
