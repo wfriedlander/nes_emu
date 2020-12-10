@@ -22,8 +22,22 @@ Mapper::Mapper(Cartridge& cart) : ram(2048), palette(32), unmapped(1024)
     MapRegion(CPU_LOW, 48, unmapped);
     MapRegion(CHR_0, 8, unmapped);
     MapRegion(NAME_0, 4, unmapped);
+
+    if (mBattery && sram.size() > 0) {
+        std::ifstream st("Saves/" + mName + ".sav", std::ofstream::binary);
+        st.read((char*)&sram[0], sram.size());
+    }
 }
 
+Mapper::~Mapper()
+{
+    if (mBattery && sram.size() > 0) {
+        std::ofstream st("Saves/" + mName + ".sav", std::ofstream::binary);
+        for (auto& b : sram) {
+            st << b;
+        }
+    }
+}
 
 byte Mapper::CpuRead(word address)
 {
@@ -218,7 +232,7 @@ void Mapper::MapRegion(REGION region, int kb_size, std::vector<byte>& mem, int b
 
     for (int i = 0; i < slices; i++) {
         table[slice + i] = &mem[offset];
-        std::cout << "MapRegion " << region_map(region + i) << offset << std::endl;
+//        std::cout << "MapRegion " << region_map(region + i) << offset << std::endl;
         offset = (offset + (slice_size * 1024)) % mem.size();
     }
 }

@@ -27,7 +27,7 @@ class Mapper : public Serializable
 {
 public:
     Mapper(Cartridge& cart);
-    virtual ~Mapper() {}
+    virtual ~Mapper();
 
 public:
     byte CpuRead(word address);

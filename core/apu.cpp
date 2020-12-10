@@ -687,11 +687,11 @@ void APU::RegisterWrite(word address, byte value)
 
 void APU::ProcessSamples(word cycles)
 {
-    mPulse0.Process(cycles);
-    mPulse1.Process(cycles);
-    mTriangle.Process(cycles);
-    mNoise.Process(cycles);
-    mDMC.Process(cycles);
+//    mPulse0.Process(cycles);
+//    mPulse1.Process(cycles);
+//    mTriangle.Process(cycles);
+//    mNoise.Process(cycles);
+//    mDMC.Process(cycles);
     mBuffer.end_frame(cycles);
     mProcessed += cycles;
 }
