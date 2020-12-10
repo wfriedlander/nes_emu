@@ -7,7 +7,7 @@
 #include <QDebug>
 
 
-GameLoader::GameLoader(NES *nes)
+GameLoader::GameLoader(Core::NES *nes)
 {
     mNes = nes;
 
@@ -28,8 +28,11 @@ GameLoader::GameLoader(NES *nes)
 
 bool GameLoader::LoadGame(const QString& filename)
 {
-    if (!mNes->Load(filename.toStdString()))
+    auto result = mNes->Load(filename.toStdString());
+    if (!result) {
+        qDebug() << result.error.c_str();
         return false;
+    }
 
     if (mRecent.contains(filename))
         mRecent.removeAll(filename);

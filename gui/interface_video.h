@@ -29,7 +29,7 @@ enum class AspectRatio
 
 
 
-class Video : public QOpenGLWidget, protected QOpenGLExtraFunctions, public IVideo
+class Video : public QOpenGLWidget, protected QOpenGLExtraFunctions, public Core::Video::Interface
 {
     Q_OBJECT
 
@@ -46,7 +46,7 @@ public:
     ~Video();
 
 public:
-    void VideoUpdate(const ScreenBuffer& buffer) override;
+    void VideoUpdate(const Core::Video::ScreenBuffer& buffer) override;
 
 protected:
     void initializeGL() override;

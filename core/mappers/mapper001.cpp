@@ -5,6 +5,9 @@
 #include <iostream>
 
 
+namespace Core {
+
+
 Mapper001::Mapper001(Cartridge& cart) : Mapper(cart)
 {
     RegisterField("reg", mReg, 4);
@@ -77,3 +80,5 @@ void Mapper001::ApplyMapping()
     }
 }
 
+
+}

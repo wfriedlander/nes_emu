@@ -4,11 +4,13 @@
 #include "interface.h"
 #include "json.h"
 
+namespace Core {
+
 
 class NES
 {
 public:
-    NES(IVideo* video, IAudio* audio, IInput* input);
+    NES(Core::Video::Interface* video, Core::Audio::Interface* audio, Core::Input::Interface* input);
     ~NES();
 
 public:
@@ -35,8 +37,10 @@ private:
 
     class RomLoader* mLoader = nullptr;
 
-    IVideo* mVideo = nullptr;
-    IAudio* mAudio = nullptr;
-    IInput* mInput = nullptr;
+    Video::Interface* mVideo = nullptr;
+    Audio::Interface* mAudio = nullptr;
+    Input::Interface* mInput = nullptr;
 };
 
+
+}

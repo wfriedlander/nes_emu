@@ -98,7 +98,7 @@ void Audio::Play()
 void Audio::Process(int16_t *out, int samples)
 {
     auto available = mBuffer->samples_avail();
-    mBuffer->read_samples((blip_sample_t*)out, samples);
+    mBuffer->read_samples((Core::blip_sample_t*)out, samples);
 
     auto now = std::chrono::high_resolution_clock::now();
     auto elapsed = now - mStart;
@@ -120,7 +120,7 @@ void Audio::Process(int16_t *out, int samples)
     }
 }
 
-void Audio::SetBuffer(Blip_Buffer *b)
+void Audio::SetBuffer(Core::Blip_Buffer *b)
 {
     mBuffer = b;
     mBuffer->clock_rate(mClockRate);

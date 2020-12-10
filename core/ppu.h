@@ -4,6 +4,9 @@
 #include "interface.h"
 #include "serializer.h"
 
+namespace Core {
+
+
 
 class Bus;
 
@@ -52,7 +55,7 @@ class PPU : public Serializable
     };
 public:
     PPU(Bus* bus);
-    void SetVideoBackend(IVideo* video);
+    void SetVideoBackend(Video::Interface* video);
 
 public:
     void RunUntil(nes_time cpu_time);
@@ -85,7 +88,7 @@ private:
 
 private:
     Bus* mBus;
-    IVideo* mVideo;
+    Video::Interface* mVideo;
 
 private:
     ppuctrl mControlReg;
@@ -122,3 +125,4 @@ private:
 };
 
 
+}

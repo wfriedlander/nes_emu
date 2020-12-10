@@ -4,6 +4,9 @@
 #include <iostream>
 
 
+namespace Core {
+
+
 Mapper::Mapper(Cartridge& cart) : ram(2048), palette(32), unmapped(1024)
 {
     mName = cart.name;
@@ -188,4 +191,4 @@ void Mapper::MapRegion(REGION region, int kb_size, std::vector<byte>& mem, int b
 
 
 
-
+}

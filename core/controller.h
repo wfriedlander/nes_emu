@@ -3,12 +3,14 @@
 #include "common.h"
 #include "interface.h"
 
+namespace Core {
+
 
 class Controller
 {
 public:
 	Controller();
-    void SetInputBackend(IInput* input);
+    void SetInputBackend(Input::Interface* input);
 
 public:
 	byte RegisterRead(word address);
@@ -18,8 +20,9 @@ private:
     void Latch();
 
 private:
-    IInput* mInput = nullptr;
+    Input::Interface* mInput = nullptr;
     byte mStateLatch0 = 0;
     byte mStateLatch1 = 0;
 };
 
+}

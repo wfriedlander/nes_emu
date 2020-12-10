@@ -9,6 +9,8 @@
 #include "controller.h"
 #include "serializer.h"
 
+namespace Core {
+
 
 class NES;
 
@@ -46,3 +48,5 @@ private:
 	std::vector<byte> mCpuRam;
 
 };
+
+}

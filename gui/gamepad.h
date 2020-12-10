@@ -1,65 +1,65 @@
-#ifndef GAMEPAD_H
-#define GAMEPAD_H
+//#ifndef GAMEPAD_H
+//#define GAMEPAD_H
 
-#include <QObject>
+//#include <QObject>
 
-#include "interface_input.h"
+//#include "interface_input.h"
 
 
-namespace GP
-{
-    enum class Button : int
-    {
-        UNKNOWN = -1,
-        A = 0,
-        B,
-        X,
-        Y,
-        LB,
-        RB,
-        LT,
-        RT,
-        BACK,
-        START,
-        L3,
-        R3,
-        UP,
-        DOWN,
-        RIGHT,
-        LEFT,
-        LSXP,
-        LSXN,
-        LSYP,
-        LSYN,
-        RSXP,
-        RSXN,
-        RSYP,
-        RSYN
-    };
-}
+//namespace GP
+//{
+//    enum class Button : int
+//    {
+//        UNKNOWN = -1,
+//        A = 0,
+//        B,
+//        X,
+//        Y,
+//        LB,
+//        RB,
+//        LT,
+//        RT,
+//        BACK,
+//        START,
+//        L3,
+//        R3,
+//        UP,
+//        DOWN,
+//        RIGHT,
+//        LEFT,
+//        LSXP,
+//        LSXN,
+//        LSYP,
+//        LSYN,
+//        RSXP,
+//        RSXN,
+//        RSYP,
+//        RSYN
+//    };
+//}
 
-class QGamepad;
+//class QGamepad;
 
-class Gamepad : public InputDevice
-{
-    Q_OBJECT
-public:
-    explicit Gamepad(QObject *parent = nullptr);
+//class Gamepad : public InputDevice
+//{
+//    Q_OBJECT
+//public:
+//    explicit Gamepad(QObject *parent = nullptr);
 
-public:
-    bool IsCodeActive(int code);
-    void EnableImmediateMode(bool enabled);
-    QString CodeToString(int code);
-    QString DeviceName();
+//public:
+//    bool IsCodeActive(int code);
+//    void EnableImmediateMode(bool enabled);
+//    QString CodeToString(int code);
+//    QString DeviceName();
 
-private:
-//    int
+//private:
+////    int
 
-private:
-    QGamepad* mGamepads[4];
-    QMetaObject::Connection c0;
-    QMetaObject::Connection c1;
+//private:
+//    QGamepad* mGamepads[4];
+//    QMetaObject::Connection c0;
+//    QMetaObject::Connection c1;
 
-};
+//};
 
-#endif // GAMEPAD_H
+//#endif // GAMEPAD_H

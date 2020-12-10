@@ -3,6 +3,8 @@
 #include "common.h"
 #include "serializer.h"
 
+namespace Core {
+
 
 class Bus;
 
@@ -109,3 +111,4 @@ private:
 };
 
 
+}

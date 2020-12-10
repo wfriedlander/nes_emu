@@ -5,6 +5,8 @@
 //#include <iostream>
 //#include <algorithm>
 
+namespace Core {
+
 
 PPU::PPU(Bus* bus) : mBus(bus)
 {
@@ -36,7 +38,7 @@ PPU::PPU(Bus* bus) : mBus(bus)
     RegisterField("shift", &mShift);
 }
 
-void PPU::SetVideoBackend(IVideo* video)
+void PPU::SetVideoBackend(Video::Interface* video)
 {
     mVideo = video;
 }
@@ -407,4 +409,6 @@ word PPU::PatternTable(byte side, word tile, byte row)
     pattern |= (l & 0x02) << 1;
     pattern |= (l & 0x01) << 0;
     return pattern;
+}
+
 }

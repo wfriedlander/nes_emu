@@ -1,5 +1,7 @@
 #include "serializer.h"
 
+namespace Core {
+
 
 const std::string base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
@@ -179,4 +181,8 @@ void Serializable::RegisterField(std::string name, byte *value, int length)
 void Serializable::RegisterField(std::string name, Serializable *value)
 {
     mItems.push_back(Item {Type::SERIALIZER, name, value});
+}
+
+
+
 }

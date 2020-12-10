@@ -5,6 +5,7 @@
 
 #include <map>
 
+namespace Core {
 
 
 
@@ -65,3 +66,5 @@ public:
 private:
     std::map<uint32_t, DBRecord> mRoms;
 };
+
+}

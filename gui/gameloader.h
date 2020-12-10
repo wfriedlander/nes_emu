@@ -9,14 +9,14 @@
 class GameLoader
 {
 public:
-    GameLoader(NES* nes);
+    GameLoader(Core::NES* nes);
 
 public:
     bool LoadGame(const QString& filename);
     const QStringList& RecentGames();
 
 private:
-    NES* mNes = nullptr;
+    Core::NES* mNes = nullptr;
     QStringList mRecent;
 };
 

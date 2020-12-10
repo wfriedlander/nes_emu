@@ -1,6 +1,8 @@
 #include "cpu.h"
 #include "bus.h"
 
+namespace Core {
+
 
 CPU::CPU(Bus* bus) : mBus(bus)
 {
@@ -656,4 +658,8 @@ void CPU::TXS()
 {
     Read(pc);
     sp = x;
+}
+
+
+
 }

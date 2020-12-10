@@ -1,6 +1,9 @@
 #include "bus.h"
 
 
+namespace Core {
+
+
 Bus::Bus() : mCpuRam(2048)
 {
     RegisterField("cpu_ram", mCpuRam.data(), 2048);
@@ -175,3 +178,4 @@ void Bus::PpuWrite(word address, byte value)
 }
 
 
+}

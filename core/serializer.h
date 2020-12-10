@@ -3,6 +3,9 @@
 #include "json.h"
 #include "common.h"
 
+namespace Core {
+
+
 class Serializable
 {
     enum class Type {
@@ -44,3 +47,5 @@ private:
     std::vector<Item> mItems;
 };
 
+
+}

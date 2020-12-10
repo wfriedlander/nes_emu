@@ -5,9 +5,11 @@
 
 #include "core/nes.h"
 
-class InputDevices;
+//class InputDevices;
 class GameLoader;
-class Input;
+namespace Input1 {
+    class Interface;
+}
 class Audio;
 class Video;
 
@@ -43,12 +45,12 @@ private:
 
 private:
     GameLoader* mLoader = nullptr;
-    Input* mInput = nullptr;
+    Input1::Interface* mInput = nullptr;
     Audio* mAudio = nullptr;
     Video* mVideo = nullptr;
-    NES* mNes = nullptr;
+    Core::NES* mNes = nullptr;
     QMenu* mRecent = nullptr;
-    InputDevices* mInputDevices = nullptr;
+//    InputDevices* mInputDevices = nullptr;
 
 private:
     bool mPlaying = false;

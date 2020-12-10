@@ -2,6 +2,9 @@
 #include "bus.h"
 
 
+namespace Core {
+
+
 ///////////////////////////////////////////////////////////////////////////
 // LENGTH COUNTER
 ////////////////////////////////////////////////////
@@ -554,7 +557,7 @@ APU::APU(Bus* bus) : mBus(bus), mPulse0(&mBuffer, 0), mPulse1(&mBuffer, 1), mTri
     RegisterField("half", &mHalfFrame);
 }
 
-void APU::SetAudioBackend(IAudio* audio)
+void APU::SetAudioBackend(Audio::Interface* audio)
 {
     audio->SetBuffer(&mBuffer);
 }
@@ -698,3 +701,4 @@ void APU::ProcessSamples(word cycles)
 
 
 
+}

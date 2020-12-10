@@ -20,8 +20,8 @@ struct AudioSettings
 
 struct InputSettings
 {
-    ControllerInfo controller[2];
-    ControllerInfo presets[10];
+//    ControllerInfo controller[2];
+//    ControllerInfo presets[10];
 };
 
 

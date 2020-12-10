@@ -21,6 +21,7 @@ SOURCES += \
     core/bus.cpp \
     core/controller.cpp \
     core/cpu.cpp \
+    core/mappers/mapper002.cpp \
     core/nes.cpp \
     core/ppu.cpp \
     core/romloader.cpp \
@@ -35,6 +36,7 @@ SOURCES += \
     gui/controllerinput.cpp \
     gui/gameloader.cpp \
     gui/gamepad.cpp \
+    gui/inputs/humaninterfacedevice.cpp \
     gui/interface_audio.cpp \
     gui/interface_input.cpp \
     gui/interface_video.cpp \
@@ -53,6 +55,7 @@ HEADERS += \
     core/interface.h \
     core/json.h \
     core/mappers.h \
+    core/mappers/mapper002.h \
     core/nes.h \
     core/ppu.h \
     core/romloader.h \
@@ -67,6 +70,7 @@ HEADERS += \
     gui/controllerinput.h \
     gui/gameloader.h \
     gui/gamepad.h \
+    gui/inputs/humaninterfacedevice.h \
     gui/interface_audio.h \
     gui/interface_input.h \
     gui/interface_video.h \

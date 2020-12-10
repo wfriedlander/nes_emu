@@ -20,6 +20,10 @@ more details. You should have received a copy of the GNU Lesser General
 Public License along with this module; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
+namespace Core {
+
+
+
 int const buffer_extra = blip_widest_impulse_ + 2;
 
 Blip_Buffer::Blip_Buffer()
@@ -404,3 +408,4 @@ void Blip_Buffer::mix_samples( blip_sample_t const* in, long count )
 	*out -= prev;
 }
 
+}

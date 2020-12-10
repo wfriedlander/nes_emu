@@ -5,6 +5,8 @@
 #include "blipbuffer.h"
 #include "serializer.h"
 
+namespace Core {
+
 
 class Bus;
 
@@ -270,7 +272,7 @@ class APU : public Serializable
 
 public:
     APU(Bus* bus);
-    void SetAudioBackend(IAudio* audio);
+    void SetAudioBackend(Audio::Interface* audio);
     void EnableLogging(bool enable);
 
 public:
@@ -311,3 +313,4 @@ private:
 };
 
 
+}

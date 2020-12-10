@@ -8,7 +8,7 @@
 #include <chrono>
 
 
-class Audio : public IAudio
+class Audio : public Core::Audio::Interface
 {
 public:
     Audio();
@@ -21,13 +21,13 @@ public:
     void Play();
 
 public:
-    void SetBuffer(Blip_Buffer* b);
+    void SetBuffer(Core::Blip_Buffer* b);
     void Process(int16_t* out, int samples);
 
 
 private:
     PaStream* mStream;
-    Blip_Buffer* mBuffer = nullptr;
+    Core::Blip_Buffer* mBuffer = nullptr;
 
     long mSampleRate = 48000;
     long mLatency = 60;

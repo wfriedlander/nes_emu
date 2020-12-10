@@ -5,6 +5,9 @@
 
 #include <iostream>
 
+namespace Core {
+
+
 struct Cartridge
 {
     std::string name;
@@ -101,3 +104,4 @@ protected:
 
 
 
+}

@@ -49,7 +49,7 @@ Video::~Video()
     }
 }
 
-void Video::VideoUpdate(const ScreenBuffer &buffer)
+void Video::VideoUpdate(const Core::Video::ScreenBuffer &buffer)
 {
     for (int y = 0; y < 240; y++)
     {

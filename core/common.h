@@ -8,6 +8,7 @@
 #include <fstream>
 #include <chrono>
 
+namespace Core {
 
 using sbyte = int8_t;
 using sword = int16_t;
@@ -106,3 +107,5 @@ struct Result<std::string>
     std::string* operator->() {return &value;}
 };
 
+
+}

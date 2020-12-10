@@ -14,7 +14,10 @@
 #include <QDebug>
 
 
-NES::NES(IVideo* video, IAudio* audio, IInput* input) : mVideo(video), mAudio(audio), mInput(input)
+namespace Core {
+
+
+NES::NES(Video::Interface* video, Audio::Interface* audio, Input::Interface* input) : mVideo(video), mAudio(audio), mInput(input)
 {
     mBus = new Bus;
     mCPU = new CPU(mBus);
@@ -145,4 +148,8 @@ void NES::DebugKey(int key)
 //		mCPU->EnableLogging(true);
 //	else if (key == 16)
 //		mCPU->EnableLogging(false);
+}
+
+
+
 }

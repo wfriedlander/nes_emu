@@ -7,6 +7,8 @@
 
 #include <QFile>
 
+namespace Core {
+
 
 static uint32_t crc32_table[] = {
     0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419, 0x706af48f,
@@ -138,6 +140,12 @@ Result<iNesRom> LoadRom(std::string filename)
         return "Invalid iNES ROM data";
     }
 
+    uint32_t* guard = reinterpret_cast<uint32_t*>(&ines.reserved[4]);
+    if (*guard != 0 && ines.ines != 2) {
+        std::cout << "DISKDUDE!" << std::endl;
+        ines.mapper_high = 0;
+    }
+
     ines.mapper = (ines.mapper_high << 4) | ines.mapper_low;
 
     ines.trainer.resize(512 * ines.trainer_size);
@@ -165,7 +173,7 @@ Result<Mapper*> RomLoader::Load(std::string filename)
         ines->four_screen ? 2 : ines->mirroring,
         ines->prg_size * 16,
         ines->chr_size * 8,
-        0,
+        ines->chr_size == 0 ? 8 : 0,
         0,
         ines->battery * 8,
         ines->battery > 0
@@ -184,11 +192,10 @@ Result<Mapper*> RomLoader::Load(std::string filename)
     switch (ines->mapper) {
     case 0: return new Mapper000(cart);
     case 1: return new Mapper001(cart);
+    case 2: return new Mapper002(cart);
     default: return "Mapper not implemented";
     }
 }
 
 
-
-
-
+}
