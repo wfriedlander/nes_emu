@@ -4,7 +4,7 @@
 #include <Windows.h>
 
 
-namespace Input1 {
+namespace Input {
 
     HIDProvider::HIDProvider(Interface* iface, int id) : QObject(iface), DeviceProvider(iface, id)
     {

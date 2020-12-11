@@ -7,7 +7,7 @@
 
 //class InputDevices;
 class GameLoader;
-namespace Input1 {
+namespace Input {
     class Interface;
 }
 class Audio;
@@ -45,7 +45,7 @@ private:
 
 private:
     GameLoader* mLoader = nullptr;
-    Input1::Interface* mInput = nullptr;
+    Input::Interface* mInput = nullptr;
     Audio* mAudio = nullptr;
     Video* mVideo = nullptr;
     Core::NES* mNes = nullptr;

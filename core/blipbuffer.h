@@ -5,6 +5,13 @@
 
 #pragma once
 
+
+#ifdef HAVE_CONFIG_H
+    #include "config.h"
+#endif
+
+#include <assert.h>
+
 namespace Core {
 
 // Time unit at source clock rate
@@ -110,10 +117,6 @@ private:
 	int length_;
 	friend class Blip_Reader;
 };
-
-#ifdef HAVE_CONFIG_H
-	#include "config.h"
-#endif
 
 // Number of bits in resample ratio fraction. Higher values give a more accurate ratio
 // but reduce maximum buffer size.
@@ -252,8 +255,6 @@ private:
 
 // End of public interface
 
-
-#include <assert.h>
 
 // Compatibility with older version
 const long blip_unscaled = 65535;

@@ -8,7 +8,7 @@
 #include "gui/interface_input.h"
 
 
-namespace Input1 {
+namespace Input {
 
 
 
@@ -19,10 +19,10 @@ public:
 
 public:
     QString Name();
-    Input1::Device* Device(int i);
+    Input::Device* Device(int i);
 
 private:
-    Input1::Device* mDevice = nullptr;
+    Input::Device* mDevice = nullptr;
 };
 
 

@@ -13,7 +13,7 @@
 
 
 
-namespace Input1 {
+namespace Input {
 
 
     void DeviceProvider::Activated(Config::Mapping button)
@@ -39,6 +39,11 @@ namespace Input1 {
             state[i] = mProviders[m.provider]->Device(m.device)->Active(m.code);
         }
         return state;
+    }
+
+    void Interface::Activated(Config::Mapping button)
+    {
+
     }
 
 

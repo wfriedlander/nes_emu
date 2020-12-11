@@ -26,7 +26,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     mVideo = new Video(this);
     mAudio = new Audio;
 
-    mInput = new Input1::Interface(this);
+    mInput = new Input::Interface(this);
 
     mNes = new Core::NES(mVideo, mAudio, mInput);
     mLoader = new GameLoader(mNes);

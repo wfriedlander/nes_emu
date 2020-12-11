@@ -10,7 +10,7 @@
 
 
 
-namespace Input1 {
+namespace Input {
     struct Config
     {
         struct Mapping
