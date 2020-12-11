@@ -1,110 +1,114 @@
-//#ifndef CONFIGURE_CONTROLLER_H
-//#define CONFIGURE_CONTROLLER_H
+#ifndef CONFIGURE_CONTROLLER_H
+#define CONFIGURE_CONTROLLER_H
 
-//#include "interface_input.h"
+#include "interface_input.h"
 
-//#include <QWidget>
-//#include <QDialog>
+#include <QWidget>
+#include <QDialog>
 
-//class QPushButton;
-//class QComboBox;
-//class QTimer;
+class QPushButton;
+class QComboBox;
+class QTimer;
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-///// \brief The ControllerDisplay class
-/////
-
-
-//class ControllerDisplay : public QWidget
-//{
-//    Q_OBJECT
-//public:
-//    explicit ControllerDisplay(QWidget *parent = nullptr);
-
-//public slots:
-//    void ResetButtonState();
-//    void SetButtonState(Button button, bool state);
-
-//signals:
-//    void ButtonPressed(Button, QPushButton*);
-
-//protected:
-//    void paintEvent(QPaintEvent* event) override;
-
-//private:
-//    QPushButton* up;
-//    QPushButton* down;
-//    QPushButton* left;
-//    QPushButton* right;
-//    QPushButton* start;
-//    QPushButton* select;
-//    QPushButton* a;
-//    QPushButton* b;
-//};
+///////////////////////////////////////////////////////////////////////////////////////////
+/// \brief The ControllerDisplay class
+///
 
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-///// \brief The ControllerPanel class
-/////
+class ControllerDisplay : public QWidget
+{
+    Q_OBJECT
+public:
+    explicit ControllerDisplay(QWidget *parent = nullptr);
 
-//class ControllerPanel : public QWidget
-//{
-//    Q_OBJECT
-//public:
-//    explicit ControllerPanel(int id, ControllerInfo& info, QWidget *parent = nullptr);
+public slots:
+    void ResetButtonState();
+    void SetButtonState(int button, bool state);
 
-//public:
-//    void ResetDisplayButtons();
-//    void SetDisplayButton(Button button, bool active);
+signals:
+    void ButtonPressed(int, QPushButton*);
 
-//private slots:
-//    void DisplayPressed(Button button, QPushButton* pushbutton);
+protected:
+    void paintEvent(QPaintEvent* event) override;
 
-//signals:
-//    void TypeChanged(QString);
-//    void SavePreset(int);
-//    void LoadPreset(int);
-//    void AssignButton(Button, QPushButton*);
-
-//private:
-//    ControllerDisplay* mDisplay = nullptr;
-//    QPushButton* mButtons[8] = { };
-//    QComboBox* mPreset = nullptr;
-//};
+private:
+    QPushButton* up;
+    QPushButton* down;
+    QPushButton* left;
+    QPushButton* right;
+    QPushButton* start;
+    QPushButton* select;
+    QPushButton* a;
+    QPushButton* b;
+};
 
 
+///////////////////////////////////////////////////////////////////////////////////////////
+/// \brief The ControllerPanel class
+///
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-///// \brief The SettingsController class
-/////
+class ControllerPanel : public QWidget
+{
+    Q_OBJECT
+public:
+    explicit ControllerPanel(int id, QWidget *parent = nullptr);
 
-//class ControllerWindow : public QDialog
-//{
-//    Q_OBJECT
-//public:
-//    explicit ControllerWindow(InputDevices* devices, ControllerInfo* controllers, QWidget *parent = nullptr);
+public:
+    void ResetDisplayButtons();
+    void SetDisplayButton(int button, bool active);
 
-//public:
-//    ControllerInfo* Controllers();
+public:
+    QPushButton* operator[](int i) {return mButtons[i];}
 
-//private slots:
-//    void AssignButton(int controller, Button button, QPushButton* pbutton);
-//    void SavePreset(int controller, int preset);
-//    void LoadPreset(int controller, int preset);
+private slots:
+    void DisplayPressed(int button, QPushButton* pushbutton);
 
-//protected:
-//    void timerEvent(QTimerEvent* event);
+signals:
+    void TypeChanged(QString);
+    void SavePreset(int);
+    void LoadPreset(int);
+    void AssignButton(int, QPushButton*);
 
-//private:
-//    int poll_id = -1;
-//    QTimer* mTimer;
-//    InputDevices* mDevices;
-//    ControllerInfo mInfo[2];
-
-//    ControllerPanel* mPanel[2];
+private:
+    ControllerDisplay* mDisplay = nullptr;
+    QPushButton* mButtons[8] = { };
+    QComboBox* mPreset = nullptr;
+};
 
 
-//    QPushButton* mSelected = nullptr;
-//};
 
-//#endif // SETTINGSCONTROLLER_H
+///////////////////////////////////////////////////////////////////////////////////////////
+/// \brief The SettingsController class
+///
+
+class ControllerWindow : public QDialog, public Input::Receiver
+{
+    Q_OBJECT
+public:
+    ControllerWindow(Input::Interface* iface, QWidget *parent = nullptr);
+
+public:
+    void Activated(Input::Config::Mapping m) override;
+
+private slots:
+    void AssignButton(int controller, int button, QPushButton* pbutton);
+    void EndAssign();
+    void SavePreset(int controller, int preset);
+    void LoadPreset(int controller, int preset);
+
+protected:
+    void timerEvent(QTimerEvent* event) override;
+
+private:
+    int poll_id = -1;
+    QTimer* mTimer;
+    Input::Interface* mInterface;
+    Input::Config mConfig[2];
+    Input::Config mOldConfig[2];
+    ControllerPanel* mPanel[2];
+    QPushButton* mSelected = nullptr;
+    int mAssignController = 0;
+    int mAssignButton = 0;
+};
+
+#endif // SETTINGSCONTROLLER_H

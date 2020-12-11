@@ -5,7 +5,6 @@
 
 #include "core/nes.h"
 
-//class InputDevices;
 class GameLoader;
 namespace Input {
     class Interface;
@@ -50,7 +49,6 @@ private:
     Video* mVideo = nullptr;
     Core::NES* mNes = nullptr;
     QMenu* mRecent = nullptr;
-//    InputDevices* mInputDevices = nullptr;
 
 private:
     bool mPlaying = false;

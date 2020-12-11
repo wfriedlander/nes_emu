@@ -12,34 +12,18 @@ namespace Input {
 
 
 
-class HIDProvider : public QObject, public DeviceProvider
-{
-public:
-    HIDProvider(Interface* interface, int device_number);
-
-public:
-    QString Name();
-    Input::Device* Device(int i);
-
-private:
-    Input::Device* mDevice = nullptr;
-};
-
-
-
-
 class HumanInterfaceDevice : public QObject, public Device, public QAbstractNativeEventFilter
 {
     Q_OBJECT
 public:
-    explicit HumanInterfaceDevice(HIDProvider* provider);
+    explicit HumanInterfaceDevice(Interface* parent, int id);
 
 public:
-    bool Active(int code) override;
+    bool Active(int sub, int code) override;
     void GetImmediate() override;
     void StopImmediate() override;
     QString CodeToString(int code) override;
-    QString Name() override;
+    QString Name(int sub) override;
 
 protected:
     bool nativeEventFilter(const QByteArray& eventType, void* message, long* result) override;

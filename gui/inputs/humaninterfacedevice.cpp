@@ -6,24 +6,6 @@
 
 namespace Input {
 
-    HIDProvider::HIDProvider(Interface* iface, int id) : QObject(iface), DeviceProvider(iface, id)
-    {
-        mDevice = new HumanInterfaceDevice(this);
-    }
-
-
-    QString HIDProvider::Name()
-    {
-        return "Human Interface Device Provider";
-    }
-
-    Device *HIDProvider::Device(int)
-    {
-        return mDevice;
-    }
-
-
-
 
     namespace HID {
         enum Code : int
@@ -482,14 +464,15 @@ namespace Input {
 
 
 
-HumanInterfaceDevice::HumanInterfaceDevice(HIDProvider* provider) : QObject(provider), Device(provider)
+HumanInterfaceDevice::HumanInterfaceDevice(Interface* parent, int id) : QObject(parent), Device(parent, id)
 {
 
 }
 
 
-bool HumanInterfaceDevice::Active(int code)
+bool HumanInterfaceDevice::Active(int sub, int code)
 {
+    if (sub != 0) return false;
     auto vkey = HID::CodeToNative((HID::Code)code);
     auto state = GetAsyncKeyState(vkey);
     return state & 0x8000;
@@ -516,9 +499,12 @@ QString HumanInterfaceDevice::CodeToString(int code)
     return HID::CodeToString((HID::Code)code);
 }
 
-QString HumanInterfaceDevice::Name()
+QString HumanInterfaceDevice::Name(int sub)
 {
-    return "Keyboard";
+    if (sub == 0)
+        return "Keyboard";
+    else
+        return "Invalid";
 }
 
 bool HumanInterfaceDevice::nativeEventFilter(const QByteArray &, void *message, long *)
@@ -532,7 +518,7 @@ bool HumanInterfaceDevice::nativeEventFilter(const QByteArray &, void *message, 
     case WM_SYSKEYDOWN:
         if (!(msg->lParam & 0x40000000)) {
             vkey = HID::MapLeftRightKeys(msg->wParam, msg->lParam);
-            mReceiver->Activated({-1, 0, HID::NativeToCode(vkey)});
+            mReceiver->Activated({mId, 0, HID::NativeToCode(vkey)});
             return true;
         }
     }

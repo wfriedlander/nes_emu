@@ -30,23 +30,20 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     mNes = new Core::NES(mVideo, mAudio, mInput);
     mLoader = new GameLoader(mNes);
-//    mInputDevices = new InputDevices(this);
 
     UpdateRecents();
 
+    Input::Config c0;
+    c0[Core::Input::Up] = {0, 0, 74};
+    c0[Core::Input::Down] = {0, 0, 75};
+    c0[Core::Input::Left] = {0, 0, 72};
+    c0[Core::Input::Right] = {0, 0, 73};
+    c0[Core::Input::Start] = {0, 0, 58};
+    c0[Core::Input::Select] = {0, 0, 42};
+    c0[Core::Input::A] = {0, 0, 5};
+    c0[Core::Input::B] = {0, 0, 3};
 
-//    InputConfig c0;
-//    c0.type = ControllerType::Standard;
-//    c0[Button::Up] = {0, 0, 74};
-//    c0[Button::Down] = {0, 0, 75};
-//    c0[Button::Left] = {0, 0, 72};
-//    c0[Button::Right] = {0, 0, 73};
-//    c0[Button::Start] = {0, 0, 58};
-//    c0[Button::Select] = {0, 0, 42};
-//    c0[Button::A] = {0, 0, 5};
-//    c0[Button::B] = {0, 0, 3};
-
-//    mInput->Controllers()[0] = mInputDevices->ControllerFromConfig(c0);
+    mInput->SetConfig(0, c0);
 
     setCentralWidget(mVideo);
     // THIS DOESN'T WORK MUST MOVE TO SHOW EVENT OR SOMETHING
@@ -121,14 +118,10 @@ void MainWindow::VideoSettings()
 
 void MainWindow::ControllerSettings()
 {
-//    ControllerInfo* ci = mInput->Controllers();
-//    auto settings = ControllerWindow(mInputDevices, ci, this);
-//    auto change = settings.exec();
-//    if (change) {
-//        auto nci = settings.Controllers();
-//        ci[0] = nci[0];
-//        ci[1] = nci[1];
-//    }
+    auto settings = ControllerWindow(mInput, this);
+    if (settings.exec()) {
+        // WRITE NEW CONFIG HERE
+    }
 }
 
 void MainWindow::About()
